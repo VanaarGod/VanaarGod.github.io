@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AP United States History — Select Your Period</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;600&family=Syncopate:wght@400;700&family=DM+Mono:wght@300;400;500&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap');
+
+    /* ── TOKENS ── */
+    :root {
+      --bg: #060606;
+      --text: #e8eaed;
+      --muted: #3a3d45;
+      --mid: #5a606e;
+      --border: rgba(255, 255, 255, 0.055);
+      --rad: 16px;
+
+      /* APUSH crimson system */
+      --g: #d9534f;
+      --g-dim: rgba(217, 83, 79, 0.08);
+      --g-border: rgba(217, 83, 79, 0.22);
+      --g-glow: rgba(217, 83, 79, 0.14);
+
+      /* per-period accent colors — a chronological palette */
+      --u1: #b5824a;
+      /* bronze/earth   — Contact & Colonization    1491–1607 */
+      --u2: #6f9c76;
+      /* colonial green — Colonial Society          1607–1754 */
+      --u3: #d94f4f;
+      /* revolution red — Revolution & Republic     1754–1800 */
+      --u4: #5b8fd4;
+      /* federal blue   — Early Republic            1800–1848 */
+      --u5: #9b3d3d;
+      /* war maroon     — Expansion & Civil War     1844–1877 */
+      --u6: #b08d3e;
+      /* gilded gold    — Industrialization         1865–1898 */
+      --u7: #4f7cac;
+      /* steel blue     — Empire & World Wars       1890–1945 */
+      --u8: #6b5b95;
+      /* atomic violet  — Cold War America          1945–1980 */
+      --u9: #4fc3a1;
+      /* modern teal    — Contemporary America      1980–Present */
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      cursor: none;
+    }
+
+    /* ── NOISE ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── GRID LINES ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 75%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── CURSOR ── */
+    #cur {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.9);
+      mix-blend-mode: difference;
+      transition: width .18s, height .18s, background .3s, box-shadow .3s;
+    }
+
+    #cur.big {
+      width: 22px;
+      height: 22px;
+      background: var(--hc, var(--g));
+      box-shadow: 0 0 20px var(--hc, var(--g));
+    }
+
+    /* ── LOADING SCREEN ── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: #020202;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.9s cubic-bezier(.4, 0, .2, 1), visibility 0.9s;
+    }
+
+    #loader.gone {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* scan lines on loader */
+    #loader::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px,
+          rgba(217, 83, 79, 0.016) 3px, rgba(217, 83, 79, 0.016) 4px);
+      animation: scanPan 8s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes scanPan {
+      0% {
+        background-position: 0 0
+      }
+
+      100% {
+        background-position: 0 400px
+      }
+    }
+
+    /* big capitol in loader */
+    .loader-scene {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin-bottom: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loader-glow-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(217, 83, 79, 0.18) 0%, rgba(217, 83, 79, 0.04) 55%, transparent 75%);
+      animation: ring-pulse 2.5s ease-in-out infinite alternate;
+      filter: blur(18px);
+    }
+
+    @keyframes ring-pulse {
+      0% {
+        transform: scale(0.88);
+        opacity: 0.7;
+      }
+
+      100% {
+        transform: scale(1.14);
+        opacity: 1;
+      }
+    }
+
+    .loader-capitol {
+      position: relative;
+      z-index: 2;
+      animation: cap-float 3s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 14px rgba(217, 83, 79, 0.7));
+    }
+
+    @keyframes cap-float {
+      0% {
+        transform: translateY(0px) rotate(-1.5deg);
+      }
+
+      100% {
+        transform: translateY(-12px) rotate(1.5deg);
+      }
+    }
+
+    /* orbit ring around capitol */
+    .loader-orbit {
+      position: absolute;
+      inset: 16px;
+      border-radius: 50%;
+      border: 1px solid rgba(217, 83, 79, 0.18);
+      animation: orbit-spin 12s linear infinite;
+    }
+
+    .loader-orbit::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--g);
+      box-shadow: 0 0 10px var(--g);
+    }
+
+    @keyframes orbit-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* secondary orbit */
+    .loader-orbit2 {
+      position: absolute;
+      inset: 30px;
+      border-radius: 50%;
+      border: 1px solid rgba(217, 83, 79, 0.1);
+      animation: orbit-spin 7s linear infinite reverse;
+    }
+
+    .loader-orbit2::before {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(217, 83, 79, 0.6);
+      box-shadow: 0 0 8px var(--g);
+    }
+
+    .loader-title {
+      font-family: 'Syncopate', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      color: #fff;
+      margin-bottom: 4px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .loader-sub2 {
+      font-family: 'Crimson Pro', serif;
+      font-style: italic;
+      font-size: 16px;
+      color: var(--g);
+      opacity: .7;
+      margin-bottom: 8px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .loader-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 8px;
+      letter-spacing: .45em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 28px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* segmented bar */
+    .loader-bar-wrap {
+      width: 280px;
+      position: relative;
+      z-index: 2;
+      margin-bottom: 10px;
+    }
+
+    .loader-segments {
+      display: flex;
+      gap: 3px;
+      height: 5px;
+    }
+
+    .loader-seg {
+      flex: 1;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loader-seg-fill {
+      position: absolute;
+      inset: 0;
+      border-radius: 3px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .loader-seg:nth-child(1) .loader-seg-fill {
+      background: #d9534f;
+      box-shadow: 0 0 7px #d9534f;
+    }
+
+    .loader-seg:nth-child(2) .loader-seg-fill {
+      background: #e8b530;
+      box-shadow: 0 0 6px #e8b530;
+    }
+
+    .loader-seg:nth-child(3) .loader-seg-fill {
+      background: #daa828;
+      box-shadow: 0 0 6px #daa828;
+    }
+
+    .loader-seg:nth-child(4) .loader-seg-fill {
+      background: #cc9b20;
+      box-shadow: 0 0 6px #cc9b20;
+    }
+
+    .loader-seg:nth-child(5) .loader-seg-fill {
+      background: #be8e18;
+      box-shadow: 0 0 5px #be8e18;
+    }
+
+    .loader-status {
+      font-family: 'DM Mono', monospace;
+      font-size: 8px;
+      letter-spacing: .3em;
+      color: var(--muted);
+      text-transform: uppercase;
+      text-align: center;
+      height: 14px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── BG AMBIENT GLOW ── */
+    #bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(217, 83, 79, 0.07) 0%, rgba(217, 83, 79, 0.02) 50%, transparent 72%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(30px);
+      animation: orb-idle 7s ease-in-out infinite;
+      transition: background 0.6s ease, filter 0.6s ease;
+    }
+
+    @keyframes orb-idle {
+
+      0%,
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      50% {
+        transform: translate(-50%, -50%) scale(1.12);
+      }
+    }
+
+    /* per-unit card hover glow on bg */
+    #bg-orb.u1h {
+      background: radial-gradient(circle, rgba(217, 83, 79, 0.13) 0%, transparent 68%);
+      filter: blur(25px);
+    }
+
+    #bg-orb.u2h {
+      background: radial-gradient(circle, rgba(91, 143, 212, 0.12) 0%, transparent 68%);
+      filter: blur(25px);
+    }
+
+    #bg-orb.u3h {
+      background: radial-gradient(circle, rgba(217, 95, 95, 0.12) 0%, transparent 68%);
+      filter: blur(25px);
+    }
+
+    #bg-orb.u4h {
+      background: radial-gradient(circle, rgba(242, 135, 73, 0.12) 0%, transparent 68%);
+      filter: blur(25px);
+    }
+
+    #bg-orb.u5h {
+      background: radial-gradient(circle, rgba(155, 134, 244, 0.12) 0%, transparent 68%);
+      filter: blur(25px);
+    }
+
+    /* ── CANVAS ── */
+    #particleCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── MAIN ── */
+    #main {
+      position: relative;
+      min-height: 100vh;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 110px 28px 100px;
+      opacity: 0;
+      transition: opacity .9s ease;
+    }
+
+    #main.show {
+      opacity: 1;
+    }
+
+    /* back link */
+    .back-link {
+      position: fixed;
+      top: 26px;
+      left: 32px;
+      z-index: 10;
+      font-family: 'DM Mono', monospace;
+      font-size: 8px;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color .25s;
+      opacity: 0;
+      animation: fadeUp .6s ease 0.3s forwards;
+    }
+
+    .back-link:hover {
+      color: var(--g);
+    }
+
+    .back-link::before {
+      content: '←';
+      font-size: 11px;
+    }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 8px;
+      letter-spacing: .5em;
+      text-transform: uppercase;
+      color: var(--g);
+      opacity: 0.7;
+      margin-bottom: 14px;
+      text-align: center;
+      animation: fadeUp .6s ease .1s forwards;
+      opacity: 0;
+    }
+
+    .main-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(32px, 5vw, 62px);
+      font-weight: 900;
+      letter-spacing: .05em;
+      color: #fff;
+      line-height: 1;
+      text-align: center;
+      margin-bottom: 6px;
+      text-shadow: 0 0 60px rgba(217, 83, 79, 0.2);
+      animation: fadeUp .8s ease .25s forwards;
+      opacity: 0;
+    }
+
+    .main-title em {
+      display: block;
+      font-family: 'Crimson Pro', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: .56em;
+      color: var(--g);
+      letter-spacing: .04em;
+      margin-top: 6px;
+    }
+
+    .main-sub {
+      font-family: 'Crimson Pro', serif;
+      font-style: italic;
+      font-size: 15px;
+      color: var(--mid);
+      margin-bottom: 40px;
+      text-align: center;
+      animation: fadeUp .7s ease .4s forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── UNIT CARDS ── */
+    .units {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      max-width: 1100px;
+      width: 100%;
+      animation: fadeUp .8s ease .55s forwards;
+      opacity: 0;
+    }
+
+    .ucard {
+      display: block;
+      position: relative;
+      overflow: hidden;
+      padding: 26px 24px 22px;
+      border-radius: var(--rad);
+      text-decoration: none;
+      color: inherit;
+      background: #080808;
+      border: 1px solid rgba(255, 255, 255, 0.055);
+      transition: transform .38s cubic-bezier(.23, 1, .32, 1),
+        border-color .3s, box-shadow .4s;
+      isolation: isolate;
+    }
+
+    /* inner glow */
+    .ucard::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--rad);
+      background: var(--card-glow, transparent);
+      opacity: 0;
+      transition: opacity .4s;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* bottom shine line */
+    .ucard::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 8%;
+      right: 8%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--ac, var(--g)), transparent);
+      opacity: 0;
+      transition: opacity .4s;
+      pointer-events: none;
+    }
+
+    .ucard>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .ucard:hover {
+      transform: translateY(-9px) scale(1.015);
+    }
+
+    .ucard:hover::before {
+      opacity: 1;
+    }
+
+    .ucard:hover::after {
+      opacity: 1;
+    }
+
+    /* shimmer sweep */
+    .shimmer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      border-radius: var(--rad);
+      background: linear-gradient(108deg, transparent 40%, rgba(255, 255, 255, 0.035) 50%, transparent 60%);
+      background-size: 200% 100%;
+      background-position: 200% 0;
+      pointer-events: none;
+      transition: background-position .55s ease;
+    }
+
+    .ucard:hover .shimmer {
+      background-position: -200% 0;
+    }
+
+    /* ── PER-PERIOD COLORS ── */
+    .u1 {
+      --ac: var(--u1);
+      --card-glow: radial-gradient(ellipse at 40% 0%, rgba(181, 130, 74, 0.09), transparent 65%);
+      border-color: rgba(181, 130, 74, 0.1);
+    }
+
+    .u1:hover {
+      border-color: rgba(181, 130, 74, 0.38);
+      box-shadow: 0 24px 80px rgba(181, 130, 74, 0.13), inset 0 1px 0 rgba(181, 130, 74, 0.18);
+    }
+
+    .u2 {
+      --ac: var(--u2);
+      --card-glow: radial-gradient(ellipse at 40% 0%, rgba(111, 156, 118, 0.09), transparent 65%);
+      border-color: rgba(111, 156, 118, 0.1);
+    }
+
+    .u2:hover {
+      border-color: rgba(111, 156, 118, 0.36);
+      box-shadow: 0 24px 80px rgba(111, 156, 118, 0.12), inset 0 1px 0 rgba(111, 156, 118, 0.16);
+    }
+
+    .u3 {
+      --ac: var(--u3);
+      --card-glow: radial-gradient(ellipse at 40% 0%, rgba(217, 79, 79, 0.09), transparent 65%);
+      border-color: rgba(217, 79, 79, 0.1);
+    }
+
+    .u3:hover {
+      border-color: rgba(217, 79, 79, 0.36);
+      box-shadow: 0 24px 80px rgba(217, 79, 79, 0.12), inset 0 1px 0 rgba(217, 79, 79, 0.16);
+    }
+
+    .u4 {
+      --ac: var(--u4);
+      --card-glow: radial-gradient(ellipse at 40% 0%, rgba(91, 143, 212, 0.09), transparent 65%);
+      border-color: rgba(91, 143, 212, 0.1);
+    }
+
+    .u4:hover {
+      border-color: rgba(91, 143, 212, 0.36);
+      box-shadow: 0 24px 80px rgba(91, 143, 212, 0.12), inset 0 1px 0 rgba(91, 143, 212, 0.16);
+    }
+
+    .u5 {
+      --ac: var(--u5);
+      --card-glow: radial-gradient(ellipse at 40% 0%, rgba(155, 61, 61, 0.09), transparent 65%);
+      border-color: rgba(155, 61, 61, 0.1);
+    }
+
+    .u5:hover {
+      border-color: rgba(155, 61, 61, 0.36);
+      box-shadow: 0 24px 80px rgba(155, 61, 61, 0.12), inset 0 1px 0 rgba(155, 61, 61, 0.16);
+    }
+
+    .u6 {
+      --ac: var(--u6);
+      --card-glow: radial-gradient(ellipse at 40% 0%, rgba(176, 141, 62, 0.09), transparent 65%);
+      border-color: rgba(176, 141, 62, 0.1);
+    }
+
+    .u6:hover {
+      border-color: rgba(176, 141, 62, 0.36);
+      box-shadow: 0 24px 80px rgba(176, 141, 62, 0.12), inset 0 1px 0 rgba(176, 141, 62, 0.16);
+    }
+
+    .u7 {
+      --ac: var(--u7);
+      --card-glow: radial-gradient(ellipse at 40% 0%, rgba(79, 124, 172, 0.09), transparent 65%);
+      border-color: rgba(79, 124, 172, 0.1);
+    }
+
+    .u7:hover {
+      border-color: rgba(79, 124, 172, 0.36);
+      box-shadow: 0 24px 80px rgba(79, 124, 172, 0.12), inset 0 1px 0 rgba(79, 124, 172, 0.16);
+    }
+
+    .u8 {
+      --ac: var(--u8);
+      --card-glow: radial-gradient(ellipse at 40% 0%, rgba(107, 91, 149, 0.09), transparent 65%);
+      border-color: rgba(107, 91, 149, 0.1);
+    }
+
+    .u8:hover {
+      border-color: rgba(107, 91, 149, 0.36);
+      box-shadow: 0 24px 80px rgba(107, 91, 149, 0.12), inset 0 1px 0 rgba(107, 91, 149, 0.16);
+    }
+
+    .u9 {
+      --ac: var(--u9);
+      --card-glow: radial-gradient(ellipse at 40% 0%, rgba(79, 195, 161, 0.09), transparent 65%);
+      border-color: rgba(79, 195, 161, 0.1);
+    }
+
+    .u9:hover {
+      border-color: rgba(79, 195, 161, 0.36);
+      box-shadow: 0 24px 80px rgba(79, 195, 161, 0.12), inset 0 1px 0 rgba(79, 195, 161, 0.16);
+    }
+
+    /* card internals */
+    .uc-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 7px;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--ac);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .uc-num::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: currentColor;
+      opacity: .2;
+    }
+
+    .uc-era {
+      font-family: 'Syncopate', sans-serif;
+      font-size: clamp(18px, 2vw, 26px);
+      font-weight: 700;
+      letter-spacing: .04em;
+      line-height: 1.15;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .uc-name {
+      font-family: 'Crimson Pro', serif;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--mid);
+      line-height: 1.5;
+      margin-bottom: 16px;
+      min-height: 44px;
+      transition: color .25s;
+    }
+
+    .ucard:hover .uc-name {
+      color: #7a8390;
+    }
+
+    .uc-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 22px;
+    }
+
+    .uc-tag {
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 6.5px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.02);
+      transition: border-color .25s, color .25s;
+    }
+
+    .ucard:hover .uc-tag {
+      border-color: rgba(var(--ac-raw, 217, 83, 79), 0.2);
+      color: var(--ac);
+    }
+
+    .uc-cta {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ac);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: gap .25s;
+    }
+
+    .ucard:hover .uc-cta {
+      gap: 13px;
+    }
+
+    .uc-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 11px;
+      transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), border-color .25s, background .25s;
+    }
+
+    .ucard:hover .uc-arrow {
+      transform: translateX(5px);
+      border-color: var(--ac);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    /* locked/soon */
+    .card-soon {
+      opacity: .42;
+      pointer-events: none;
+    }
+
+    .soon-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 6px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      margin-top: 36px;
+      z-index: 4;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 7px;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: #1e2028;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .units {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .units {
+        grid-template-columns: 1fr;
+      }
+
+      #cur {
+        display: none;
+      }
+
+      body {
+        cursor: auto;
+      }
+
+      footer {
+        position: relative;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- CURSOR -->
+  <div id="cur"></div>
+
+  <!-- LOADER -->
+  <div id="loader">
+    <div class="loader-scene">
+      <div class="loader-glow-ring"></div>
+      <div class="loader-orbit"></div>
+      <div class="loader-orbit2"></div>
+      <div class="loader-capitol">
+        <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- base -->
+          <rect x="8" y="72" width="74" height="10" rx="3" fill="#d9534f" opacity=".85" />
+          <!-- steps -->
+          <rect x="16" y="62" width="58" height="10" rx="2" fill="#d9534f" opacity=".6" />
+          <rect x="24" y="54" width="42" height="8" rx="1.5" fill="#d9534f" opacity=".45" />
+          <!-- dome body -->
+          <path d="M45 10 C28 10 22 32 22 46 L68 46 C68 32 62 10 45 10Z" fill="#d9534f" opacity=".48" />
+          <!-- dome highlight -->
+          <path d="M45 10 C38 10 34 22 33 32 L45 32 C45 22 45 10 45 10Z" fill="#d9534f" opacity=".12" />
+          <!-- lantern -->
+          <rect x="40" y="2" width="10" height="12" rx="3" fill="#d9534f" opacity=".92" />
+          <rect x="43" y="0" width="4" height="4" rx="1" fill="#d9534f" />
+          <!-- drum -->
+          <rect x="30" y="46" width="30" height="8" rx="1" fill="#d9534f" opacity=".32" />
+          <!-- columns -->
+          <rect x="26" y="54" width="4" height="8" rx="1" fill="#d9534f" opacity=".38" />
+          <rect x="34" y="54" width="4" height="8" rx="1" fill="#d9534f" opacity=".38" />
+          <rect x="52" y="54" width="4" height="8" rx="1" fill="#d9534f" opacity=".38" />
+          <rect x="60" y="54" width="4" height="8" rx="1" fill="#d9534f" opacity=".38" />
+          <!-- windows -->
+          <rect x="38" y="48" width="5" height="6" rx="1" fill="#d9534f" opacity=".22" />
+          <rect x="47" y="48" width="5" height="6" rx="1" fill="#d9534f" opacity=".22" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="loader-title">AP USH</div>
+    <div class="loader-sub2">United States History</div>
+    <div class="loader-eyebrow">College Board · AP Program · 2025</div>
+
+    <div class="loader-bar-wrap">
+      <div class="loader-segments">
+        <div class="loader-seg">
+          <div class="loader-seg-fill"></div>
+        </div>
+        <div class="loader-seg">
+          <div class="loader-seg-fill"></div>
+        </div>
+        <div class="loader-seg">
+          <div class="loader-seg-fill"></div>
+        </div>
+        <div class="loader-seg">
+          <div class="loader-seg-fill"></div>
+        </div>
+        <div class="loader-seg">
+          <div class="loader-seg-fill"></div>
+        </div>
+      </div>
+    </div>
+    <div class="loader-status" id="loaderStatus">Loading study environment…</div>
+  </div>
+
+  <!-- BG -->
+  <div id="bg-orb"></div>
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- MAIN -->
+  <main id="main">
+    <a class="back-link" href="index.html">Back to Subjects</a>
+
+    <div class="eyebrow">AP United States History</div>
+    <h1 class="main-title">Select <em>Your Period</em></h1>
+    <p class="main-sub">Contact through the present · nine periods, the same way College Board scores the exam</p>
+
+    <section class="units">
+
+      <a class="ucard u1" href="apush-unit1.html" onmouseenter="cardHover(this,'u1h','#b5824a')"
+        onmouseleave="cardOut()">
+        <div class="shimmer"></div>
+        <div class="uc-num">Period 1 · 1491–1607</div>
+        <div class="uc-era">Contact &amp;<br />Encounter</div>
+        <div class="uc-name">Native societies, European exploration, and the Columbian Exchange</div>
+        <div class="uc-tags">
+          <span class="uc-tag">Columbian Exchange</span>
+          <span class="uc-tag">Encomienda</span>
+          <span class="uc-tag">Native Nations</span>
+        </div>
+        <div class="uc-cta">Enter Period 1 <span class="uc-arrow">→</span></div>
+      </a>
+
+      <a class="ucard u2" href="apush-unit2.html" onmouseenter="cardHover(this,'u2h','#6f9c76')"
+        onmouseleave="cardOut()">
+        <div class="shimmer"></div>
+        <div class="uc-num">Period 2 · 1607–1754</div>
+        <div class="uc-era">Colonial<br />Society</div>
+        <div class="uc-name">Colonial settlement, labor systems, and regional development</div>
+        <div class="uc-tags">
+          <span class="uc-tag">Mercantilism</span>
+          <span class="uc-tag">Slavery</span>
+          <span class="uc-tag">Great Awakening</span>
+        </div>
+        <div class="uc-cta">Enter Period 2 <span class="uc-arrow">→</span></div>
+      </a>
+
+      <a class="ucard u3" href="apush-unit3.html" onmouseenter="cardHover(this,'u3h','#d94f4f')"
+        onmouseleave="cardOut()">
+        <div class="shimmer"></div>
+        <div class="uc-num">Period 3 · 1754–1800</div>
+        <div class="uc-era">Revolution &amp;<br />Republic</div>
+        <div class="uc-name">Imperial conflict, revolution, and the founding of the republic</div>
+        <div class="uc-tags">
+          <span class="uc-tag">Common Sense</span>
+          <span class="uc-tag">Articles</span>
+          <span class="uc-tag">Constitution</span>
+        </div>
+        <div class="uc-cta">Enter Period 3 <span class="uc-arrow">→</span></div>
+      </a>
+
+      <a class="ucard u4" href="apush-unit4.html" onmouseenter="cardHover(this,'u4h','#5b8fd4')"
+        onmouseleave="cardOut()">
+        <div class="shimmer"></div>
+        <div class="uc-num">Period 4 · 1800–1848</div>
+        <div class="uc-era">Early<br />Republic</div>
+        <div class="uc-name">Democratization, market revolution, and reform movements</div>
+        <div class="uc-tags">
+          <span class="uc-tag">Jacksonian Dem.</span>
+          <span class="uc-tag">Market Revolution</span>
+          <span class="uc-tag">Reform</span>
+        </div>
+        <div class="uc-cta">Enter Period 4 <span class="uc-arrow">→</span></div>
+      </a>
+
+      <a class="ucard u5" href="apush-unit5.html" onmouseenter="cardHover(this,'u5h','#9b3d3d')"
+        onmouseleave="cardOut()">
+        <div class="shimmer"></div>
+        <div class="uc-num">Period 5 · 1844–1877</div>
+        <div class="uc-era">Expansion &amp;<br />Civil War</div>
+        <div class="uc-name">Manifest destiny, sectional crisis, Civil War, and Reconstruction</div>
+        <div class="uc-tags">
+          <span class="uc-tag">Manifest Destiny</span>
+          <span class="uc-tag">Secession</span>
+          <span class="uc-tag">Reconstruction</span>
+        </div>
+        <div class="uc-cta">Enter Period 5 <span class="uc-arrow">→</span></div>
+      </a>
+
+      <a class="ucard u6" href="apush-unit6.html" onmouseenter="cardHover(this,'u6h','#b08d3e')"
+        onmouseleave="cardOut()">
+        <div class="shimmer"></div>
+        <div class="uc-num">Period 6 · 1865–1898</div>
+        <div class="uc-era">Industrial-<br />ization</div>
+        <div class="uc-name">Big business, immigration, urbanization, and the closing of the frontier</div>
+        <div class="uc-tags">
+          <span class="uc-tag">Gilded Age</span>
+          <span class="uc-tag">Immigration</span>
+          <span class="uc-tag">Populism</span>
+        </div>
+        <div class="uc-cta">Enter Period 6 <span class="uc-arrow">→</span></div>
+      </a>
+
+      <a class="ucard u7" href="apush-unit7.html" onmouseenter="cardHover(this,'u7h','#4f7cac')"
+        onmouseleave="cardOut()">
+        <div class="shimmer"></div>
+        <div class="uc-num">Period 7 · 1890–1945</div>
+        <div class="uc-era">Empire &amp;<br />World Wars</div>
+        <div class="uc-name">Progressivism, overseas empire, the Depression, and two world wars</div>
+        <div class="uc-tags">
+          <span class="uc-tag">Progressivism</span>
+          <span class="uc-tag">New Deal</span>
+          <span class="uc-tag">WWII</span>
+        </div>
+        <div class="uc-cta">Enter Period 7 <span class="uc-arrow">→</span></div>
+      </a>
+
+      <a class="ucard u8" href="apush-unit8.html" onmouseenter="cardHover(this,'u8h','#6b5b95')"
+        onmouseleave="cardOut()">
+        <div class="shimmer"></div>
+        <div class="uc-num">Period 8 · 1945–1980</div>
+        <div class="uc-era">Cold War<br />America</div>
+        <div class="uc-name">Containment, civil rights, the Great Society, and postwar culture</div>
+        <div class="uc-tags">
+          <span class="uc-tag">Containment</span>
+          <span class="uc-tag">Civil Rights</span>
+          <span class="uc-tag">Great Society</span>
+        </div>
+        <div class="uc-cta">Enter Period 8 <span class="uc-arrow">→</span></div>
+      </a>
+
+      <a class="ucard u9" href="apush-unit9.html" onmouseenter="cardHover(this,'u9h','#4fc3a1')"
+        onmouseleave="cardOut()">
+        <div class="shimmer"></div>
+        <div class="uc-num">Period 9 · 1980–Present</div>
+        <div class="uc-era">Contemporary<br />America</div>
+        <div class="uc-name">Conservative resurgence, globalization, technology, and the modern era</div>
+        <div class="uc-tags">
+          <span class="uc-tag">Reaganomics</span>
+          <span class="uc-tag">Globalization</span>
+          <span class="uc-tag">War on Terror</span>
+        </div>
+        <div class="uc-cta">Enter Period 9 <span class="uc-arrow">→</span></div>
+      </a>
+
+    </section>
+  </main>
+
+  <footer>
+    <span>AP United States History</span>
+    <span>·</span>
+    <span>2025 Study Guide</span>
+  </footer>
+
+  <script>
+    // ── CURSOR ──
+    const cur = document.getElementById('cur');
+    if (window.matchMedia('(pointer:fine)').matches) {
+      document.addEventListener('mousemove', e => {
+        cur.style.left = e.clientX + 'px';
+        cur.style.top = e.clientY + 'px';
+      });
+      document.addEventListener('mousedown', () => { cur.style.width = '20px'; cur.style.height = '20px'; });
+      document.addEventListener('mouseup', () => { cur.style.width = '12px'; cur.style.height = '12px'; });
+    }
+
+    // ── CARD HOVER STATE ──
+    let hoveredUnit = null;
+    const bgOrb = document.getElementById('bg-orb');
+
+    function cardHover(el, cls, color) {
+      hoveredUnit = cls;
+      bgOrb.className = cls;
+      cur.classList.add('big');
+      cur.style.setProperty('--hc', color);
+    }
+    function cardOut() {
+      hoveredUnit = null;
+      bgOrb.className = '';
+      cur.classList.remove('big');
+    }
+
+    // ── LOADER ──
+    const segs = document.querySelectorAll('.loader-seg-fill');
+    const statuses = ['Loading environment…', 'Unrolling the timeline…', 'Sorting primary sources…', 'Preparing periods 1–9…', 'Ready.'];
+    let si = 0;
+    function fillNext() {
+      if (si < segs.length) {
+        segs[si].style.transform = 'scaleX(1)';
+        document.getElementById('loaderStatus').textContent = statuses[si];
+        si++;
+        setTimeout(fillNext, 300 + Math.random() * 180);
+      }
+    }
+    setTimeout(fillNext, 380);
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loader').classList.add('gone');
+        setTimeout(() => document.getElementById('main').classList.add('show'), 280);
+      }, 2600);
+    });
+
+    // ── PARTICLES — historical / archival symbols ──
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    resize(); window.addEventListener('resize', resize);
+
+    // Period accent colors mapped to class names
+    const UNIT_COLORS = {
+      u1h: [181, 130, 74],
+      u2h: [111, 156, 118],
+      u3h: [217, 79, 79],
+      u4h: [91, 143, 212],
+      u5h: [155, 61, 61],
+      u6h: [176, 141, 62],
+      u7h: [79, 124, 172],
+      u8h: [107, 91, 149],
+      u9h: [79, 195, 161],
+    };
+    const DEFAULT_RGB = [217, 83, 79];
+
+    function getParticleRGB(unitClass) {
+      return UNIT_COLORS[unitClass] || DEFAULT_RGB;
+    }
+
+    class Particle {
+      constructor() { this.init(true); }
+      init(scatter) {
+        this.x = Math.random() * W;
+        this.y = scatter ? Math.random() * H : H + 50;
+        this.size = 13 + Math.random() * 16;
+        this.speed = 0.18 + Math.random() * 0.44;
+        this.drift = (Math.random() - 0.5) * 0.32;
+        this.rot = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.011;
+        this.baseAlpha = 0.2 + Math.random() * 0.38;
+        this.type = ['doc', 'quill', 'star5', 'pillar', 'seal'][Math.floor(Math.random() * 5)];
+        // each particle gets assigned to a "period zone" (x-band) loosely
+        const zone = Math.floor(this.x / (W / 9));
+        this.unitZone = ['u1h', 'u2h', 'u3h', 'u4h', 'u5h', 'u6h', 'u7h', 'u8h', 'u9h'][Math.min(zone, 8)];
+      }
+      update() {
+        this.y -= this.speed; this.x += this.drift; this.rot += this.rotSpeed;
+        if (this.y < -55) this.init(false);
+      }
+      draw() {
+        // brightness: if a unit is hovered, particles in that zone glow; others fade
+        let alpha = this.baseAlpha;
+        if (hoveredUnit) {
+          alpha = hoveredUnit === this.unitZone
+            ? Math.min(this.baseAlpha * 2.6, 1)
+            : this.baseAlpha * 0.1;
+        }
+        if (alpha < 0.01) return;
+
+        // color follows the hovered unit, else default amber
+        const rgb = hoveredUnit ? getParticleRGB(hoveredUnit) : DEFAULT_RGB;
+        const [r, g, b] = rgb;
+        const col = `rgba(${r},${g},${b},${alpha})`;
+        const colF = `rgba(${r},${g},${b},${alpha * 0.6})`;
+        const s = this.size;
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rot);
+        ctx.strokeStyle = col; ctx.fillStyle = colF; ctx.lineWidth = 1.5;
+
+        if (this.type === 'doc') {
+          // parchment / document
+          const w = s * 0.72, h = s * 1.05;
+          ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 3); ctx.stroke();
+          // dog-eared corner
+          const cz = s * 0.18;
+          ctx.beginPath();
+          ctx.moveTo(w / 2 - cz, -h / 2);
+          ctx.lineTo(w / 2, -h / 2 + cz);
+          ctx.stroke();
+          // text lines
+          ctx.lineWidth = 1;
+          for (let i = 0; i < 4; i++) {
+            const ly = -h / 2 + h * 0.2 + i * h * 0.17;
+            const lw = i === 3 ? w * 0.38 : w * 0.6;
+            ctx.beginPath(); ctx.moveTo(-lw / 2, ly); ctx.lineTo(lw / 2, ly); ctx.stroke();
+          }
+          // seal dot
+          ctx.beginPath(); ctx.arc(0, h / 2 - h * 0.13, s * 0.09, 0, Math.PI * 2); ctx.fill();
+
+        } else if (this.type === 'quill') {
+          // feather quill pen
+          ctx.beginPath();
+          ctx.moveTo(0, -s * 0.55);
+          ctx.bezierCurveTo(s * 0.33, -s * 0.18, s * 0.38, s * 0.2, 0, s * 0.55);
+          ctx.bezierCurveTo(-s * 0.38, s * 0.2, -s * 0.33, -s * 0.18, 0, -s * 0.55);
+          ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(0, -s * 0.55); ctx.lineTo(0, s * 0.62); ctx.stroke();
+          // nib point
+          ctx.beginPath();
+          ctx.moveTo(-s * 0.08, s * 0.55); ctx.lineTo(0, s * 0.7); ctx.lineTo(s * 0.08, s * 0.55);
+          ctx.stroke();
+
+        } else if (this.type === 'star5') {
+          // 5-pointed star (American flag star)
+          ctx.beginPath();
+          for (let i = 0; i < 5; i++) {
+            const a = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+            const a2 = ((i * 4 + 2) * Math.PI) / 5 - Math.PI / 2;
+            const ro = s * 0.5, ri = s * 0.22;
+            i === 0 ? ctx.moveTo(Math.cos(a) * ro, Math.sin(a) * ro)
+              : ctx.lineTo(Math.cos(a) * ro, Math.sin(a) * ro);
+            ctx.lineTo(Math.cos(a2) * ri, Math.sin(a2) * ri);
+          }
+          ctx.closePath(); ctx.stroke();
+
+        } else if (this.type === 'pillar') {
+          // Greek/Roman column
+          const pw = s * 0.36, ph = s * 0.92;
+          ctx.lineWidth = 1.2;
+          ctx.strokeRect(-pw * 0.72, -ph / 2, pw * 1.44, s * 0.14);    // capital
+          ctx.strokeRect(-pw * 0.72, ph / 2 - s * 0.14, pw * 1.44, s * 0.14); // base
+          ctx.strokeRect(-pw / 2, -ph / 2 + s * 0.14, pw, ph - s * 0.28);  // shaft
+          // flutes
+          ctx.lineWidth = 0.7;
+          const flutes = [-pw * 0.22, 0, pw * 0.22];
+          flutes.forEach(fx => {
+            ctx.beginPath();
+            ctx.moveTo(fx, -ph / 2 + s * 0.14); ctx.lineTo(fx, ph / 2 - s * 0.14); ctx.stroke();
+          });
+
+        } else if (this.type === 'seal') {
+          // stylized circular seal (eagle-ish)
+          const ro = s * 0.48;
+          ctx.beginPath(); ctx.arc(0, 0, ro, 0, Math.PI * 2); ctx.stroke();
+          ctx.beginPath(); ctx.arc(0, 0, ro * 0.72, 0, Math.PI * 2); ctx.stroke();
+          // 13 spokes
+          ctx.lineWidth = 0.7;
+          for (let i = 0; i < 13; i++) {
+            const a = (i * 2 * Math.PI) / 13;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(a) * ro * 0.72, Math.sin(a) * ro * 0.72);
+            ctx.lineTo(Math.cos(a) * ro, Math.sin(a) * ro);
+            ctx.stroke();
+          }
+          // center dot
+          ctx.beginPath(); ctx.arc(0, 0, s * 0.1, 0, Math.PI * 2); ctx.fill();
+        }
+
+        ctx.restore();
+      }
+    }
+
+    const particles = [];
+    for (let i = 0; i < 90; i++) particles.push(new Particle());
+
+    function animate() {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+
+</html>
