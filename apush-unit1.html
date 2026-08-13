@@ -1,0 +1,2796 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AP US History — Period 1 (1491–1607)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #07080a;
+      --card: #0d0f12;
+      --card2: #12161c;
+      --border: rgba(255, 255, 255, 0.07);
+      --text: #dde3ec;
+      --muted: #7a8699;
+      --gold: #c9a84c;
+      --teal: #3eb89a;
+      --blue: #5b8fd4;
+      --red: #d95f5f;
+      --orange: #f28749;
+      --purple: #9b86f4;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "DM Mono", monospace;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: .35;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #cursor {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--gold);
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: difference;
+      transition: width .2s ease, height .2s ease;
+    }
+
+    #readingProgress {
+      position: fixed;
+      top: 0;
+      left: 72px;
+      right: 0;
+      height: 2px;
+      z-index: 100;
+    }
+
+    #readingProgressFill {
+      width: 0%;
+      height: 100%;
+      background: var(--gold);
+    }
+
+    #ambientOverlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 60% 10%, rgba(201, 168, 76, .12), transparent 65%);
+      opacity: .1;
+      pointer-events: none;
+      transition: background 1s ease, opacity .25s ease;
+      z-index: 0;
+    }
+
+    #sidebar {
+      width: 72px;
+      height: 100vh;
+      flex-shrink: 0;
+      background: rgba(5, 6, 8, .84);
+      border-right: 1px solid var(--border);
+      backdrop-filter: blur(24px);
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+      transition: width .4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    #sidebar:hover,
+    #sidebar.pinned {
+      width: 264px;
+    }
+
+    #pinBtn {
+      position: absolute;
+      top: 12px;
+      right: 10px;
+      padding: 4px 7px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 8px;
+      letter-spacing: .08em;
+      opacity: 0;
+      cursor: none;
+      transition: opacity .25s ease, color .2s ease, border-color .2s ease;
+    }
+
+    #sidebar:hover #pinBtn,
+    #sidebar.pinned #pinBtn {
+      opacity: 1;
+    }
+
+    #pinBtn.pinned {
+      color: var(--gold);
+      border-color: rgba(201, 168, 76, .24);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      border: 1px solid rgba(201, 168, 76, .2);
+      background: rgba(201, 168, 76, .07);
+      color: var(--gold);
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+
+    .logo-copy {
+      opacity: 0;
+      transition: opacity .25s ease;
+    }
+
+    #sidebar:hover .logo-copy,
+    #sidebar.pinned .logo-copy {
+      opacity: 1;
+    }
+
+    .logo-copy h1 {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 13px;
+      letter-spacing: .25em;
+      color: var(--gold);
+    }
+
+    .logo-copy p {
+      color: var(--muted);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .search-wrap {
+      position: relative;
+      padding: 10px;
+    }
+
+    .sb-search-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .03);
+      color: var(--muted);
+      cursor: none;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease, border-color .2s ease;
+    }
+
+    #sidebar:hover .sb-search-trigger,
+    #sidebar.pinned .sb-search-trigger {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sb-search-trigger:hover {
+      border-color: rgba(201, 168, 76, .2);
+    }
+
+    #sbSearchPanel {
+      position: absolute;
+      top: calc(100% - 4px);
+      left: 10px;
+      right: 10px;
+      border: 1px solid rgba(201, 168, 76, .18);
+      background: rgba(8, 10, 13, .98);
+      border-radius: 12px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity .22s ease, transform .22s ease;
+      z-index: 80;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, .65);
+    }
+
+    #sbSearchPanel.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    #sbSearchInner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, .05);
+    }
+
+    #sbInput {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 10px;
+      letter-spacing: .1em;
+      outline: none;
+      cursor: none;
+    }
+
+    #sbResults {
+      max-height: 280px;
+      overflow: auto;
+    }
+
+    .sb-result {
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, .04);
+      cursor: none;
+      transition: background .15s ease;
+    }
+
+    .sb-result:hover {
+      background: rgba(201, 168, 76, .06);
+    }
+
+    .sb-result:last-child {
+      border-bottom: none;
+    }
+
+    .sb-result-tab {
+      font-size: 8px;
+      color: var(--gold);
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .sb-result-term {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 14px;
+      color: white;
+      letter-spacing: .04em;
+    }
+
+    .sb-result-snip {
+      font-family: "Crimson Pro", serif;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-top: 2px;
+    }
+
+    nav {
+      height: calc(100vh - 176px);
+      padding: 0 10px 14px;
+      overflow: auto;
+    }
+
+    .nav-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      cursor: none;
+      white-space: nowrap;
+      transition: background .2s ease, color .2s ease;
+      position: relative;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, .03);
+      color: #aeb7c6;
+    }
+
+    .nav-btn.active {
+      background: rgba(201, 168, 76, .07);
+      color: var(--gold);
+    }
+
+    .nav-btn.active .nav-indicator {
+      opacity: 1;
+    }
+
+    .nav-indicator {
+      position: absolute;
+      left: 0;
+      width: 2px;
+      height: 24px;
+      background: var(--gold);
+      border-radius: 5px;
+      opacity: 0;
+    }
+
+    .nav-label {
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity .25s ease;
+    }
+
+    #sidebar:hover .nav-label,
+    #sidebar.pinned .nav-label {
+      opacity: 1;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 9px;
+      letter-spacing: .1em;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .sidebar-footer span:last-child {
+      opacity: 0;
+      transition: opacity .25s ease;
+    }
+
+    #sidebar:hover .sidebar-footer span:last-child,
+    #sidebar.pinned .sidebar-footer span:last-child {
+      opacity: 1;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: blink 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    #main {
+      flex: 1;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 36px 54px 80px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+      padding: 8px 0 20px;
+      backdrop-filter: blur(8px);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .glass-btn,
+    #scoreTracker {
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(255, 255, 255, .05);
+      color: var(--muted);
+      padding: 9px 14px;
+      font: inherit;
+      font-size: 9px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      cursor: none;
+      backdrop-filter: blur(12px);
+      transition: border-color .2s ease, color .2s ease, background .2s ease;
+      white-space: nowrap;
+    }
+
+    .glass-btn:hover,
+    #scoreTracker:hover {
+      color: var(--gold);
+      border-color: rgba(201, 168, 76, .26);
+    }
+
+    .glass-btn.active {
+      color: var(--gold);
+      border-color: rgba(201, 168, 76, .32);
+      background: rgba(201, 168, 76, .08);
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeUp .45s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .page-header {
+      margin-bottom: 34px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .unit-tag {
+      display: block;
+      color: var(--gold);
+      font-size: 10px;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .page-header h2 {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(38px, 5vw, 62px);
+      letter-spacing: .08em;
+      line-height: .96;
+      color: white;
+    }
+
+    .page-header p {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .hero-grid,
+    .principle-grid,
+    .case-grid,
+    .exam-grid,
+    .democracy-grid,
+    .structure-grid,
+    .federal-grid,
+    .writing-grid,
+    .glossary-grid,
+    .flash-grid {
+      display: grid;
+      gap: 22px;
+    }
+
+    .hero-grid {
+      grid-template-columns: 1.15fr .85fr;
+      margin-bottom: 26px;
+    }
+
+    .democracy-grid,
+    .structure-grid,
+    .case-grid,
+    .writing-grid,
+    .flash-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .principle-grid,
+    .federal-grid,
+    .glossary-grid {
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .exam-grid {
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    }
+
+    .card,
+    .feature-card,
+    .principle-card,
+    .case-card,
+    .exam-card,
+    .flash-card,
+    .timeline-item,
+    .writing-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      transition: transform .24s ease, border-color .24s ease, box-shadow .24s ease;
+    }
+
+    .card:hover,
+    .feature-card:hover,
+    .principle-card:hover,
+    .case-card:hover,
+    .exam-card:hover,
+    .flash-card:hover,
+    .timeline-item:hover,
+    .writing-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, .14);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, .35);
+    }
+
+    .hero-card::before,
+    .feature-card::before,
+    .principle-card::before,
+    .case-card::before,
+    .exam-card::before,
+    .writing-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 2px;
+      background: var(--accent, var(--gold));
+      opacity: .6;
+    }
+
+    .hero-card {
+      --accent: var(--gold);
+    }
+
+    .accent-blue {
+      --accent: var(--blue);
+    }
+
+    .accent-teal {
+      --accent: var(--teal);
+    }
+
+    .accent-red {
+      --accent: var(--red);
+    }
+
+    .accent-orange {
+      --accent: var(--orange);
+    }
+
+    .accent-purple {
+      --accent: var(--purple);
+    }
+
+    .card-sub {
+      color: var(--accent, var(--gold));
+      font-size: 9px;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 28px;
+      letter-spacing: .05em;
+      color: white;
+      margin-bottom: 16px;
+    }
+
+    .body-copy,
+    .bullet-list,
+    .timeline-copy,
+    .case-copy,
+    .writing-copy,
+    .exam-copy,
+    .feature-copy {
+      font-family: "Crimson Pro", serif;
+      color: var(--muted);
+      line-height: 1.82;
+      font-size: 15px;
+    }
+
+    .body-copy p+p,
+    .feature-copy p+p,
+    .case-copy p+p,
+    .writing-copy p+p,
+    .exam-copy p+p {
+      margin-top: 12px;
+    }
+
+    .bullet-list {
+      padding-left: 18px;
+    }
+
+    .bullet-list li+li {
+      margin-top: 10px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 18px;
+    }
+
+    .tag {
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, .07);
+      background: rgba(255, 255, 255, .03);
+      color: var(--muted);
+      font-size: 7px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .dash-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .stat-box {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .02);
+      padding: 16px;
+    }
+
+    .stat-box span {
+      display: block;
+      color: var(--muted);
+      font-size: 8px;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .stat-box strong {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 26px;
+      letter-spacing: .06em;
+      color: white;
+    }
+
+    .focus-callout {
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(201, 168, 76, .16);
+      background: rgba(201, 168, 76, .05);
+    }
+
+    .focus-callout .label {
+      color: var(--gold);
+      font-size: 8px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .principle-card h3,
+    .case-card h3,
+    .exam-card h3,
+    .flash-front h3,
+    .timeline-year,
+    .writing-card h3 {
+      font-family: "Bebas Neue", sans-serif;
+      color: white;
+      letter-spacing: .05em;
+    }
+
+    .principle-card h3,
+    .case-card h3,
+    .exam-card h3,
+    .writing-card h3 {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .timeline-year {
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+
+    .mini-label {
+      color: var(--gold);
+      font-size: 8px;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    .two-col-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .list-panel {
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .02);
+    }
+
+    .list-panel h4 {
+      color: white;
+      font-size: 11px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .list-panel ul {
+      padding-left: 18px;
+      font-family: "Crimson Pro", serif;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .timeline {
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+    }
+
+    .timeline-item {
+      min-width: 320px;
+      max-width: 360px;
+      flex: 0 0 320px;
+      border-left: 2px solid rgba(201, 168, 76, .22);
+      padding-left: 24px;
+      scroll-snap-align: start;
+      background:
+        linear-gradient(180deg, rgba(201, 168, 76, .04), transparent 40%),
+        var(--card);
+    }
+
+    .timeline-copy {
+      margin-top: 8px;
+    }
+
+    .timeline-copy ul {
+      margin-top: 10px;
+      padding-left: 18px;
+    }
+
+    .timeline-copy li+li {
+      margin-top: 6px;
+    }
+
+    .course-link {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .notes-shell {
+      display: grid;
+      grid-template-columns: minmax(230px, 300px) 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .notes-index {
+      position: sticky;
+      top: 88px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, .025);
+      padding: 18px;
+    }
+
+    .notes-index-title {
+      color: var(--accent, var(--blue));
+      font-size: 9px;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .note-jump {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 0;
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-align: left;
+      text-transform: uppercase;
+      cursor: none;
+    }
+
+    .note-jump:last-child {
+      border-bottom: none;
+    }
+
+    .note-jump span:last-child {
+      color: var(--muted);
+    }
+
+    .note-jump:hover {
+      color: var(--accent, var(--blue));
+    }
+
+    .notes-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .note-section {
+      scroll-margin-top: 110px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--card);
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .note-section::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent, var(--blue));
+      opacity: .7;
+    }
+
+    .note-section h3 {
+      font-family: "Bebas Neue", sans-serif;
+      color: white;
+      font-size: 30px;
+      letter-spacing: .05em;
+      margin-bottom: 12px;
+    }
+
+    .note-section h4 {
+      font-family: "Bebas Neue", sans-serif;
+      color: white;
+      font-size: 21px;
+      letter-spacing: .05em;
+      margin: 18px 0 8px;
+    }
+
+    .note-section .body-copy+.body-copy {
+      margin-top: 12px;
+    }
+
+    .note-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .mini-note {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .025);
+      padding: 16px;
+    }
+
+    .mini-note>strong {
+      display: block;
+      color: white;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 19px;
+      letter-spacing: .05em;
+      margin-bottom: 8px;
+    }
+
+    .timeline-intro {
+      margin-bottom: 18px;
+      padding: 18px 20px;
+      border: 1px solid rgba(201, 168, 76, .14);
+      border-radius: 16px;
+      background: rgba(201, 168, 76, .04);
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .glossary-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .glossary-toolbar input {
+      min-width: 260px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .03);
+      color: var(--text);
+      padding: 11px 14px;
+      font: inherit;
+      font-size: 10px;
+      letter-spacing: .1em;
+      outline: none;
+      cursor: none;
+    }
+
+    .glossary-card h4 {
+      font-family: "Bebas Neue", sans-serif;
+      color: white;
+      font-size: 22px;
+      letter-spacing: .04em;
+      margin-bottom: 12px;
+    }
+
+    .flash-card {
+      perspective: 1000px;
+      cursor: none;
+      min-height: 240px;
+    }
+
+    .flash-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 184px;
+      transform-style: preserve-3d;
+      transition: transform .55s ease;
+    }
+
+    .flash-card.flipped .flash-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flash-front,
+    .flash-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .flash-back {
+      transform: rotateY(180deg);
+    }
+
+    .flash-hint {
+      color: var(--muted);
+      font-size: 8px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(3, 4, 6, .74);
+      backdrop-filter: blur(16px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .22s ease;
+      z-index: 120;
+    }
+
+    .modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      width: min(760px, calc(100vw - 32px));
+      max-height: min(84vh, 920px);
+      overflow: auto;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, .1);
+      background: rgba(10, 12, 16, .96);
+      padding: 28px;
+      box-shadow: 0 36px 90px rgba(0, 0, 0, .55);
+    }
+
+    .modal-close {
+      float: right;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 9px;
+      letter-spacing: .14em;
+      cursor: none;
+    }
+
+    .modal-title {
+      font-family: "Bebas Neue", sans-serif;
+      color: white;
+      font-size: 38px;
+      letter-spacing: .06em;
+      margin-bottom: 8px;
+    }
+
+    .modal-sub {
+      color: var(--gold);
+      font-size: 9px;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .quiz-status {
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .quiz-question {
+      font-family: "Crimson Pro", serif;
+      color: white;
+      font-size: 24px;
+      line-height: 1.35;
+      margin-bottom: 20px;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .quiz-option {
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .03);
+      color: var(--text);
+      font: inherit;
+      font-size: 11px;
+      letter-spacing: .04em;
+      cursor: none;
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .quiz-option:hover {
+      border-color: rgba(201, 168, 76, .2);
+    }
+
+    .quiz-option.correct {
+      border-color: rgba(62, 184, 154, .35);
+      background: rgba(62, 184, 154, .08);
+    }
+
+    .quiz-option.wrong {
+      border-color: rgba(217, 95, 95, .35);
+      background: rgba(217, 95, 95, .08);
+    }
+
+    .quiz-feedback {
+      margin-top: 18px;
+      font-family: "Crimson Pro", serif;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .quiz-next {
+      margin-top: 18px;
+    }
+
+    .essay-list {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .essay-topic-btn {
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .03);
+      color: var(--text);
+      font: inherit;
+      font-size: 10px;
+      letter-spacing: .08em;
+      cursor: none;
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .essay-topic-btn:hover,
+    .essay-topic-btn.active {
+      border-color: rgba(201, 168, 76, .24);
+      background: rgba(201, 168, 76, .07);
+    }
+
+    .essay-outline {
+      display: none;
+      gap: 14px;
+    }
+
+    .essay-outline.show {
+      display: grid;
+    }
+
+    .essay-block {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .025);
+      padding: 18px;
+    }
+
+    .essay-block-label {
+      color: var(--gold);
+      font-size: 8px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      margin-bottom: 9px;
+    }
+
+    .essay-block-body {
+      font-family: "Crimson Pro", serif;
+      color: var(--muted);
+      line-height: 1.78;
+      font-size: 15px;
+    }
+
+    strong.ap-term {
+      color: #f1dc9c;
+      font-weight: 600;
+    }
+
+    body.ap-highlight strong.ap-term {
+      background: rgba(201, 168, 76, .12);
+      padding: 0 3px;
+      border-radius: 3px;
+      box-shadow: 0 0 10px rgba(201, 168, 76, .15);
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .2;
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1020px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dash-stats,
+      .two-col-list {
+        grid-template-columns: 1fr;
+      }
+
+      #main {
+        padding-left: 26px;
+        padding-right: 26px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        cursor: auto;
+        overflow: auto;
+        display: block;
+      }
+
+      #cursor,
+      #readingProgress {
+        display: none;
+      }
+
+      #sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      #sidebar:hover,
+      #sidebar.pinned {
+        width: 100%;
+      }
+
+      .logo-copy,
+      .nav-label,
+      .sidebar-footer span:last-child,
+      .sb-search-trigger {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+
+      #pinBtn {
+        display: none;
+      }
+
+      nav {
+        height: auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      #main {
+        height: auto;
+        overflow: visible;
+      }
+
+      .topbar {
+        position: static;
+      }
+
+      .glossary-toolbar input {
+        min-width: 100%;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+  <div id="cursor"></div>
+  <div id="ambientOverlay"></div>
+  <div id="readingProgress">
+    <div id="readingProgressFill"></div>
+  </div>
+
+  <aside id="sidebar">
+    <button id="pinBtn" type="button">Pin</button>
+    <div class="sidebar-logo">
+      <div class="logo-icon">AP</div>
+      <div class="logo-copy">
+        <h1>APUSH UNIT 1</h1>
+        <p>Contact &amp; Colonization</p>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <button class="sb-search-trigger" id="openSearch" type="button">⌕ <span>Search Unit 1</span></button>
+      <div id="sbSearchPanel">
+        <div id="sbSearchInner">
+          <span style="color: var(--gold); font-size: 12px;">⌕</span>
+          <input id="sbInput" type="text" placeholder="Find people, terms, or themes" />
+        </div>
+        <div id="sbResults"></div>
+      </div>
+    </div>
+
+    <nav id="sidebarNav"></nav>
+
+    <div class="sidebar-footer">
+      <span class="dot"></span>
+      <span>Study Mode Active</span>
+    </div>
+  </aside>
+
+  <main id="main">
+    <div class="topbar">
+      <div class="top-actions">
+        <a class="glass-btn course-link" href="apush-index.html">Course Home</a>
+        <a class="glass-btn course-link" href="apush-unit1.html">Period 1</a>
+        <a class="glass-btn course-link" href="apush-unit2.html">Period 2</a>
+        <a class="glass-btn course-link" href="apush-unit3.html">Period 3</a>
+        <button class="glass-btn" id="apToggleBtn" type="button">AP Highlight</button>
+        <button class="glass-btn" id="quizOpenBtn" type="button">Launch Quiz</button>
+        <button class="glass-btn" id="essayOpenBtn" type="button">Prompt Bank</button>
+      </div>
+      <div id="scoreTracker">Best Quiz: <span id="bestScore">--</span></div>
+    </div>
+
+    <section class="tab-content active" id="dashboard">
+      <header class="page-header">
+        <span class="unit-tag">Period 1 · 1491–1607</span>
+        <h2>Contact and Colonization</h2>
+        <p>Native North America · European exploration · the Columbian Exchange · early colonies</p>
+      </header>
+
+      <div class="hero-grid">
+        <article class="card hero-card">
+          <div class="card-sub">Core Frame</div>
+          <div class="card-title">What Period 1 Is Really About</div>
+          <div class="body-copy">
+            <p><strong class="ap-term">1491</strong> stands in for the diverse, complex Indigenous world that existed
+              before sustained European contact. <strong class="ap-term">1607</strong>, the founding of
+              <strong class="ap-term">Jamestown</strong>, marks the shift from sporadic voyages to durable English
+              colonization. Everything between those markers is really one long story: contact reorganizes power,
+              land, labor, and culture on every side of the Atlantic.</p>
+            <p>Remember that <strong class="ap-term">Columbus</strong> was not the first European in North America —
+              the <strong class="ap-term">Norse</strong> reached modern Canada around the year 1000. What makes 1492
+              transformative is that it starts sustained, large-scale Atlantic contact, not first contact.</p>
+          </div>
+          <div class="dash-stats">
+            <div class="stat-box">
+              <span>Study Sections</span>
+              <strong>8</strong>
+            </div>
+            <div class="stat-box">
+              <span>Key Terms</span>
+              <strong>28</strong>
+            </div>
+            <div class="stat-box">
+              <span>Quiz Items</span>
+              <strong>8</strong>
+            </div>
+          </div>
+          <div class="focus-callout">
+            <div class="label">Exam Focus</div>
+            <div class="body-copy">
+              Build answers as chains: environment or motive → contact or policy → effect on people, land, or labor.
+            </div>
+          </div>
+        </article>
+
+        <article class="card feature-card accent-blue">
+          <div class="card-sub">Fast Review</div>
+          <div class="card-title">What You Must Be Able To Explain</div>
+          <ul class="bullet-list">
+            <li>How environment shaped the diversity of Native societies before 1491.</li>
+            <li>The economic, religious, and political motives behind European exploration.</li>
+            <li>How the <strong class="ap-term">Columbian Exchange</strong> reshaped populations, ecosystems, and
+              economies on both sides of the Atlantic.</li>
+            <li>How Spain's conquest and labor systems compared with France, the Netherlands, and England.</li>
+            <li>Why labor systems shifted from Indigenous coercion toward the <strong class="ap-term">transatlantic
+                slave trade</strong>.</li>
+            <li>How Jamestown and early New England set the patterns for English colonization.</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Native Nations</span>
+            <span class="tag">Columbian Exchange</span>
+            <span class="tag">Colonization</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="exam-grid">
+        <article class="exam-card accent-red">
+          <div class="mini-label">Common Mistakes</div>
+          <h3>Avoid These</h3>
+          <ul class="bullet-list">
+            <li>Treating Native societies as one culture instead of hundreds of distinct nations.</li>
+            <li>Saying "Europeans wanted to explore" without naming a specific motive or actor.</li>
+            <li>Listing Columbian Exchange items without explaining their impact.</li>
+            <li>Assuming slavery began only in the English colonies rather than earlier under Spain.</li>
+          </ul>
+        </article>
+
+        <article class="exam-card accent-teal">
+          <div class="mini-label">Study Strategy</div>
+          <h3>Best Order To Review</h3>
+          <ul class="bullet-list">
+            <li>Start with Native diversity and regional adaptation.</li>
+            <li>Move to European motives, technology, and Columbus.</li>
+            <li>Study the Columbian Exchange as cause and effect.</li>
+            <li>Compare Spanish, French, Dutch, and English colonial models.</li>
+            <li>Finish with labor systems, cultural encounters, and Jamestown.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+
+    <section class="tab-content" id="notes">
+      <header class="page-header">
+        <span class="unit-tag">Knowt-Style Notes</span>
+        <h2>Period 1 Notes Index</h2>
+        <p>Native nations · exploration · exchange · colonization · labor · Jamestown</p>
+      </header>
+
+      <div class="notes-shell">
+        <aside class="notes-index accent-gold" aria-label="Period 1 notes index">
+          <div class="notes-index-title">Major Buckets</div>
+          <button class="note-jump" type="button" data-note-target="u1-note-peoples"><span>Peopling &amp; Native
+              Nations</span><span>01</span></button>
+          <button class="note-jump" type="button" data-note-target="u1-note-exploration"><span>European
+              Exploration</span><span>02</span></button>
+          <button class="note-jump" type="button" data-note-target="u1-note-exchange"><span>Columbian
+              Exchange</span><span>03</span></button>
+          <button class="note-jump" type="button" data-note-target="u1-note-spain"><span>Spanish
+              Conquest</span><span>04</span></button>
+          <button class="note-jump" type="button" data-note-target="u1-note-rivals"><span>France, Dutch &amp;
+              England</span><span>05</span></button>
+          <button class="note-jump" type="button" data-note-target="u1-note-labor"><span>Labor &amp;
+              Slavery</span><span>06</span></button>
+          <button class="note-jump" type="button" data-note-target="u1-note-encounters"><span>Cultural
+              Encounters</span><span>07</span></button>
+          <button class="note-jump" type="button"
+            data-note-target="u1-note-jamestown"><span>Jamestown &amp; New England</span><span>08</span></button>
+        </aside>
+
+        <div class="notes-stack">
+          <article class="note-section accent-gold" id="u1-note-peoples">
+            <div class="mini-label">01 · Peopling of the Americas</div>
+            <h3>Native Nations Before Sustained Contact</h3>
+            <div class="body-copy">
+              <p>The traditional explanation for how humans first reached the Americas is the
+                <strong class="ap-term">Bering Land Bridge</strong>: during a colder global climate, lower sea levels
+                exposed a land connection between Siberia and Alaska. As the planet warmed, rising seas submerged
+                that land and formed the <strong class="ap-term">Bering Strait</strong>.</p>
+              <p>By 1491 there was no single Indigenous experience — North America held hundreds of distinct nations,
+                cities, and societies. The clearest way to explain that diversity for AP writing is a causal chain:
+                climate and geography shape available food sources, food systems shape population density, and
+                population density shapes political organization, belief systems, and trade.</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Southwest</strong>
+                <div class="body-copy">Pueblo peoples built settled communities around maize, bean, and squash
+                  agriculture supported by irrigation in an arid climate.</div>
+              </div>
+              <div class="mini-note"><strong>Pacific Northwest</strong>
+                <div class="body-copy">Abundant salmon supported large, permanent, socially complex settlements
+                  without large-scale farming; canoes and totem poles reflect that stability.</div>
+              </div>
+              <div class="mini-note"><strong>Great Basin</strong>
+                <div class="body-copy">Dispersed resources favored smaller, more mobile hunting-and-gathering
+                  groups with less centralized political organization.</div>
+              </div>
+              <div class="mini-note"><strong>Northeast</strong>
+                <div class="body-copy">Groups mixed farming, hunting, and fishing; the Iroquois Confederacy
+                  (Haudenosaunee) shows sophisticated multi-nation diplomacy.</div>
+              </div>
+            </div>
+            <h4>AP Move</h4>
+            <div class="body-copy">When a prompt names a region, connect environment to food system to political
+              structure — that three-step chain earns reasoning credit on its own.</div>
+          </article>
+
+          <article class="note-section accent-blue" id="u1-note-exploration">
+            <div class="mini-label">02 · Why Europe Looked Outward</div>
+            <h3>European Expansion and the Competitive Atlantic</h3>
+            <div class="body-copy">
+              <p>European exploration accelerated in the 1400s and 1500s for overlapping reasons. Economically,
+                states wanted direct access to Asian trade and, after 1492, American silver, gold, sugar, and land.
+                Religiously, many Europeans felt a duty to spread Christianity, which also supported political
+                control. Politically, exploration became a tool of rivalry between competing monarchies.</p>
+              <p>Better ships (the <strong class="ap-term">caravel</strong>), instruments (the compass and
+                astrolabe), and mapmaking made ocean crossings more reliable. In August 1492,
+                <strong class="ap-term">Columbus</strong> sailed with three caravels funded by the Spanish Crown,
+                reached the Caribbean, and encountered the <strong class="ap-term">Taíno</strong> — a voyage often
+                summarized as a search for "gold, glory, and God."</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Treaty of Tordesillas (1494)</strong>
+                <div class="body-copy">Spain and Portugal, with papal support, drew a line dividing Atlantic claims —
+                  evidence that Europeans partitioned the Americas without Indigenous consent.</div>
+              </div>
+              <div class="mini-note"><strong>Joint-Stock Companies</strong>
+                <div class="body-copy">Shareholder-funded ventures such as the Virginia Company spread the financial
+                  risk of expensive, uncertain overseas colonization.</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="note-section accent-teal" id="u1-note-exchange">
+            <div class="mini-label">03 · Biological Transformation</div>
+            <h3>The Columbian Exchange</h3>
+            <div class="body-copy">
+              <p>The <strong class="ap-term">Columbian Exchange</strong> was the rapid transfer of plants, animals,
+                people, and disease across the Atlantic after 1492. It was not simple, equal trade — it remade
+                ecosystems, economies, and populations, often through conquest and coercion.</p>
+              <p>The most consequential transfer was <strong class="ap-term">smallpox</strong> and other Old World
+                diseases. With little immunity, Indigenous communities suffered catastrophic mortality that weakened
+                resistance to conquest and destabilized leadership — largely an unintended consequence of contact
+                with enormous political effects.</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Old World → New World</strong>
+                <div class="body-copy">Horses, pigs, cattle, wheat, and grapes reshaped land use, mobility, and
+                  warfare, especially on the Plains once horse culture spread.</div>
+              </div>
+              <div class="mini-note"><strong>New World → Old World</strong>
+                <div class="body-copy">Corn, potatoes, tomatoes, and sweet potatoes boosted food production and
+                  population growth across Europe, Africa, and Asia.</div>
+              </div>
+              <div class="mini-note"><strong>Silver</strong>
+                <div class="body-copy">Spanish silver extraction linked the Americas, Europe, and Asia into a more
+                  interconnected global trade network.</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="note-section accent-red" id="u1-note-spain">
+            <div class="mini-label">04 · Conquest, Labor, Religion</div>
+            <h3>Spanish Conquest and Colonization</h3>
+            <div class="body-copy">
+              <p>Spanish success was multi-causal, not just superior weapons.
+                <strong class="ap-term">Hernán Cortés</strong> began his campaign against the Aztec Empire in 1519 by
+                allying with rivals of the Aztecs; <strong class="ap-term">Francisco Pizarro</strong> conquered the
+                Inca beginning in 1532 amid internal political division. In both cases, disease weakened resistance
+                and destabilized rule.</p>
+              <p>Under the <strong class="ap-term">encomienda system</strong>, the crown granted colonists authority
+                over Native people, who were supposedly protected and converted in exchange for forced labor and
+                tribute — in practice often as brutal as slavery. Spain also used <strong class="ap-term">missions</strong>
+                to convert Native peoples, suppressing Indigenous religion in the process. Critics such as
+                <strong class="ap-term">Bartolomé de las Casas</strong> condemned the brutality, even as belief in
+                European superiority remained nearly universal.</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>St. Augustine (1565)</strong>
+                <div class="body-copy">Spanish Florida settlement; the oldest continuously occupied
+                  European-founded settlement in the present-day United States.</div>
+              </div>
+              <div class="mini-note"><strong>Ponce de León &amp; de Soto</strong>
+                <div class="body-copy">Explored Florida (c. 1513) and the Southeast (from 1539), extending Spanish
+                  claims north of Mexico.</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="note-section accent-orange" id="u1-note-rivals">
+            <div class="mini-label">05 · Competing Colonial Models</div>
+            <h3>France, the Netherlands, and England</h3>
+            <div class="body-copy">
+              <p>Different goals produced different colonization patterns. <strong class="ap-term">France</strong>
+                emphasized the fur trade; because trade depended on Native cooperation, the French favored diplomacy
+                and alliances, stayed few in number, and often intermarried with Native communities (the
+                <strong class="ap-term">coureurs du bois</strong>). France founded Quebec City in 1608.
+                The <strong class="ap-term">Dutch</strong> focused on commerce and trading posts rather than mass
+                settlement.</p>
+              <p><strong class="ap-term">England</strong> leaned toward settler colonization — migrants wanted
+                permanent land to farm and pass on, which increased land pressure and conflict with Native peoples.
+                England's early attempts were fragile: the 1587 Roanoke colony had vanished by 1590, and a durable
+                settlement did not exist until Jamestown in 1607.</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Spain</strong>
+                <div class="body-copy">Conquest, missions, and coerced labor produced large-scale disruption of
+                  Native societies.</div>
+              </div>
+              <div class="mini-note"><strong>France</strong>
+                <div class="body-copy">Trade-driven alliances created more diplomatic interdependence, with conflict
+                  tied to trade competition.</div>
+              </div>
+              <div class="mini-note"><strong>Netherlands</strong>
+                <div class="body-copy">Commercial ports and shipping shaped a competition- and trade-centered
+                  presence.</div>
+              </div>
+              <div class="mini-note"><strong>England</strong>
+                <div class="body-copy">Permanent agricultural settlement produced high land pressure, displacement,
+                  and frequent conflict.</div>
+              </div>
+            </div>
+            <h4>AP Move</h4>
+            <div class="body-copy">Avoid absolutes — France was not always peaceful and England was not always
+              violent. Anchor comparisons to a clear criterion: labor system, land use, or religion.</div>
+          </article>
+
+          <article class="note-section accent-purple" id="u1-note-labor">
+            <div class="mini-label">06 · From Coercion to the Slave Trade</div>
+            <h3>Labor, Slavery, and Caste in the Atlantic World</h3>
+            <div class="body-copy">
+              <p>Colonizers needed large labor forces to extract wealth and grow cash crops. Indigenous labor was
+                targeted first through systems like encomienda, but demographic collapse, harsh conditions, and
+                resistance made it hard to sustain at scale. Enslaved Africans first arrived in Spanish colonies as
+                early as 1501, and the labor crisis helped drive the growth of the
+                <strong class="ap-term">transatlantic slave trade</strong>.</p>
+              <p>Planters increasingly preferred enslaved Africans over enslaved Native people: Africans did not know
+                the local land and were less likely to escape, were removed from their home communities, and
+                English colonists rationalized enslavement using constructed ideas about race. Before slavery fully
+                dominated, <strong class="ap-term">indentured servitude</strong> — a set term of labor in exchange for
+                passage — was the major Chesapeake labor system; more than 75% of the roughly 130,000 English
+                migrants to the Chesapeake in the 1600s arrived as indentured servants.</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Middle Passage</strong>
+                <div class="body-copy">The brutal Atlantic crossing for enslaved Africans; roughly one-fifth of
+                  those aboard often died during the voyage.</div>
+              </div>
+              <div class="mini-note"><strong>Regional Slavery</strong>
+                <div class="body-copy">Labor-intensive tobacco, rice, and indigo drove Southern plantation slavery;
+                  Northern slavery was smaller-scale, tied to farms, shipping, and domestic service.</div>
+              </div>
+              <div class="mini-note"><strong>Ending the Trade</strong>
+                <div class="body-copy">Congress ended U.S. participation in the Atlantic slave trade in 1808 — but
+                  slavery itself continued until 1865.</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="note-section accent-teal" id="u1-note-encounters">
+            <div class="mini-label">07 · Cooperation, Conflict, and Blending</div>
+            <h3>Cultural Encounters</h3>
+            <div class="body-copy">
+              <p>Contact was an ongoing negotiation, not one moment — both sides adapted. Native peoples generally
+                viewed land as the source of life rather than private property, while Europeans believed land should
+                be tamed and privately owned; those mismatched assumptions fueled repeated conflict over land, labor,
+                and religion.</p>
+              <p><strong class="ap-term">Syncretism</strong> — the blending of religious or cultural traditions —
+                appears throughout Period 1, from Native adaptations of Christian ritual to enslaved Africans
+                blending West African traditions with Christianity, as in religions like voodoo. Some enslaved
+                people escaped to form independent <strong class="ap-term">Maroon</strong> communities, an early form
+                of resistance within the Atlantic system.</p>
+            </div>
+          </article>
+
+          <article class="note-section accent-gold" id="u1-note-jamestown">
+            <div class="mini-label">08 · English Colonization Takes Hold</div>
+            <h3>Jamestown and Early New England</h3>
+            <div class="body-copy">
+              <p><strong class="ap-term">Jamestown</strong> (1607), funded by the <strong class="ap-term">Virginia
+                  Company</strong>, nearly failed — within three months, more than half the original settlers were
+                dead from starvation or disease. <strong class="ap-term">John Rolfe</strong> helped save the colony by
+                marrying Pocahontas and pioneering large-scale <strong class="ap-term">tobacco</strong> cultivation,
+                a labor- and land-hungry cash crop that pushed colonists to expand and rely on coerced labor.</p>
+              <p>Virginia introduced the <strong class="ap-term">headright system</strong> (1618, roughly 50 acres per
+                settler) to attract labor, and in 1619 created the <strong class="ap-term">House of Burgesses</strong>,
+                the first representative assembly in English North America. That same year is also commonly used to
+                mark the start of slavery in the English colonies. Further north, Separatists founded
+                <strong class="ap-term">Plymouth</strong> in 1620 and signed the <strong class="ap-term">Mayflower
+                  Compact</strong>; Puritans founded Massachusetts Bay during the Great Migration (1629–1642) under
+                Governor John Winthrop's "city upon a hill."</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Chesapeake</strong>
+                <div class="body-copy">Profit-driven, dispersed tobacco plantations, mostly single male migrants,
+                  and growing reliance on indentured and enslaved labor.</div>
+              </div>
+              <div class="mini-note"><strong>New England</strong>
+                <div class="body-copy">Family migration, longer life expectancy, tighter town-and-meetinghouse
+                  communities, and far less reliance on enslaved labor.</div>
+              </div>
+              <div class="mini-note"><strong>Dissent</strong>
+                <div class="body-copy">Roger Williams (banished, founded Rhode Island) and Anne Hutchinson
+                  (banished for challenging clergy authority) show Puritan intolerance of internal dissent.</div>
+              </div>
+            </div>
+            <h4>AP Move</h4>
+            <div class="body-copy">Use the Chesapeake–New England contrast as ready-made comparison evidence for any
+              LEQ about regional divergence in colonial society.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-content" id="peoples">
+      <header class="page-header">
+        <span class="unit-tag">Before 1491</span>
+        <h2>Native Nations and Regional Adaptation</h2>
+        <p>Environment shapes food systems, food systems shape society</p>
+      </header>
+
+      <div class="democracy-grid">
+        <article class="feature-card accent-gold">
+          <div class="card-sub">Southwest</div>
+          <div class="card-title">Irrigated Maize Communities</div>
+          <div class="feature-copy">
+            <p>Pueblo peoples built settled towns supported by maize, bean, and squash agriculture and careful
+              irrigation in an arid climate — a strong example of adaptation over "primitive" stereotypes.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-blue">
+          <div class="card-sub">Pacific Northwest</div>
+          <div class="card-title">Abundance Without Farming</div>
+          <div class="feature-copy">
+            <p>Coastal groups relied on salmon and other fish to support large, permanent, socially stratified
+              settlements — proof that dense, complex society does not require large-scale agriculture.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-teal">
+          <div class="card-sub">Great Basin</div>
+          <div class="card-title">Mobility Over Density</div>
+          <div class="feature-copy">
+            <p>Dispersed resources meant smaller, more mobile groups relying on hunting and gathering, with less
+              centralized political organization than farming societies.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-orange">
+          <div class="card-sub">Great Plains</div>
+          <div class="card-title">Seasonal Movement</div>
+          <div class="feature-copy">
+            <p>Before widespread horse culture intensified mobility after contact, many Plains groups combined
+              hunting with limited farming and moved with the seasons.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-purple">
+          <div class="card-sub">Northeast</div>
+          <div class="card-title">Confederated Diplomacy</div>
+          <div class="feature-copy">
+            <p>Groups mixed farming, hunting, and fishing. The Iroquois Confederacy (Haudenosaunee) united multiple
+              nations to manage diplomacy and conflict — sophisticated political organization long before contact.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-red">
+          <div class="card-sub">Southeast &amp; Mississippi Valley</div>
+          <div class="card-title">Mound-Building and Trade</div>
+          <div class="feature-copy">
+            <p>Earlier mound-building cultures such as Cahokia reveal deep histories of large settlements and
+              long-distance trade in shells, copper, obsidian, and maize well before 1491.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-content" id="exploration">
+      <header class="page-header">
+        <span class="unit-tag">1400s–1500s</span>
+        <h2>Why Europe Looked Outward</h2>
+        <p>Economic, religious, and political motives — plus the tools that made it possible</p>
+      </header>
+
+      <div class="principle-grid">
+        <article class="principle-card accent-blue">
+          <div class="mini-label">Economic</div>
+          <h3>Trade, Wealth, and New Land</h3>
+          <div class="body-copy">
+            <p>Europeans wanted direct access to Asian goods and, after 1492, American silver, gold, sugar, and new
+              commodities — plus opportunities for investment and land ownership.</p>
+          </div>
+        </article>
+
+        <article class="principle-card accent-gold">
+          <div class="mini-label">Religious</div>
+          <h3>Christianity and Empire</h3>
+          <div class="body-copy">
+            <p>Many Europeans believed they had a duty to spread Christianity. Missionary sincerity and political
+              control were often intertwined, not separate motives.</p>
+          </div>
+        </article>
+
+        <article class="principle-card accent-red">
+          <div class="mini-label">Political</div>
+          <h3>Rivalry Between States</h3>
+          <div class="body-copy">
+            <p>Exploration became a tool of competition between centralizing monarchies. Spain and Portugal led
+              early; France, the Netherlands, and England followed to avoid falling behind.</p>
+          </div>
+        </article>
+
+        <article class="principle-card accent-teal">
+          <div class="mini-label">Technology</div>
+          <h3>What Made Voyages Possible</h3>
+          <ul class="bullet-list">
+            <li>The <strong class="ap-term">caravel</strong> improved ship design for ocean travel.</li>
+            <li>The compass and astrolabe improved navigation and route-finding.</li>
+            <li>Better mapmaking and Atlantic wind/current knowledge reduced risk.</li>
+          </ul>
+        </article>
+
+        <article class="principle-card accent-orange">
+          <div class="mini-label">1492</div>
+          <h3>Columbus and the Spanish Lead</h3>
+          <div class="body-copy">
+            <p>Columbus sailed with three Spanish-funded caravels seeking a westward route to India, reached the
+              Caribbean, and encountered the Taíno — opening sustained Atlantic contact, often summarized as a
+              search for "gold, glory, and God."</p>
+          </div>
+        </article>
+
+        <article class="principle-card accent-purple">
+          <div class="mini-label">1494</div>
+          <h3>Treaty of Tordesillas</h3>
+          <div class="body-copy">
+            <p>Spain and Portugal, with papal backing, drew a line dividing Atlantic claims — a reminder that empires
+              partitioned the Americas through European diplomacy, without Indigenous consent.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-content" id="exchange">
+      <header class="page-header">
+        <span class="unit-tag">After 1492</span>
+        <h2>The Columbian Exchange</h2>
+        <p>Biological transfer becomes economic and demographic transformation</p>
+      </header>
+
+      <div class="structure-grid">
+        <article class="feature-card accent-red">
+          <div class="card-sub">Old World → New World</div>
+          <div class="card-title">Horses, Livestock, Grain</div>
+          <div class="feature-copy">
+            <p>Horses, pigs, cattle, wheat, and grapes reshaped mobility, hunting, warfare, and farming across the
+              Americas — horses especially transformed Plains life over time.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-teal">
+          <div class="card-sub">New World → Old World</div>
+          <div class="card-title">Corn, Potatoes, Tomatoes</div>
+          <div class="feature-copy">
+            <p>New staple crops raised food production and helped fuel population growth across Europe, Africa, and
+              Asia.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-orange">
+          <div class="card-sub">Catastrophe</div>
+          <div class="card-title">Smallpox and Demographic Collapse</div>
+          <div class="feature-copy">
+            <p>Old World diseases devastated Indigenous populations with little immunity, weakening resistance and
+              destabilizing leadership — a largely unintended consequence with enormous political effects.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-purple">
+          <div class="card-sub">Global Trade</div>
+          <div class="card-title">Silver and Interconnection</div>
+          <div class="feature-copy">
+            <p>Spanish silver extraction linked the Americas, Europe, and Asia into a genuinely global trade
+              network — evidence the Exchange was economic as much as biological.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-content" id="empires">
+      <header class="page-header">
+        <span class="unit-tag">Comparing Empires</span>
+        <h2>Spain, France, the Netherlands, England</h2>
+        <p>Different goals produced different colonial methods</p>
+      </header>
+
+      <div class="case-grid">
+        <article class="case-card accent-red">
+          <div class="mini-label">Wealth &amp; Conversion</div>
+          <h3>Spain</h3>
+          <div class="case-copy">
+            <p>Conquest, formal colonies, missions, and coerced labor (encomienda) drove large-scale disruption of
+              Native societies, alongside forced religious conversion.</p>
+          </div>
+        </article>
+
+        <article class="case-card accent-blue">
+          <div class="mini-label">Trade &amp; Alliance</div>
+          <h3>France</h3>
+          <div class="case-copy">
+            <p>Fur-trade dependence on Native cooperation encouraged diplomacy and intermarriage; fewer settlers
+              meant more diplomatic interdependence, with conflict tied to trade competition.</p>
+          </div>
+        </article>
+
+        <article class="case-card accent-teal">
+          <div class="mini-label">Commerce &amp; Ports</div>
+          <h3>Netherlands</h3>
+          <div class="case-copy">
+            <p>A commercial, shipping-focused approach favored trading posts over mass settlement, shaping
+              competition and alliances around trade routes.</p>
+          </div>
+        </article>
+
+        <article class="case-card accent-gold">
+          <div class="mini-label">Land &amp; Settlement</div>
+          <h3>England</h3>
+          <div class="case-copy">
+            <p>Settler colonization sought permanent farmland for families, producing high land pressure,
+              displacement, and frequent conflict with Native nations.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="two-col-list">
+        <div class="list-panel">
+          <h4>Native View of Land &amp; Religion</h4>
+          <ul>
+            <li>Land as the source of life, not a commodity to sell.</li>
+            <li>Often a spirit-filled natural world; some belief in one supreme being.</li>
+            <li>Kinship extended beyond the nuclear family to shape social organization.</li>
+          </ul>
+        </div>
+        <div class="list-panel">
+          <h4>European View of Land &amp; Religion</h4>
+          <ul>
+            <li>Land tamed and held through private ownership.</li>
+            <li>The Roman Catholic Church held major political and spiritual authority.</li>
+            <li>Family life centered more narrowly on parents and children.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-content" id="labor">
+      <header class="page-header">
+        <span class="unit-tag">Coercion and Commerce</span>
+        <h2>Labor, Slavery, and Caste</h2>
+        <p>From encomienda to indentured servitude to the transatlantic slave trade</p>
+      </header>
+
+      <div class="exam-grid">
+        <article class="exam-card accent-red">
+          <div class="mini-label">Spanish America</div>
+          <h3>Encomienda</h3>
+          <div class="exam-copy">
+            <p>Colonists received authority over Native people, owing them protection and conversion in exchange
+              for labor and tribute — legally distinct from slavery but frequently just as brutal in practice.</p>
+          </div>
+        </article>
+
+        <article class="exam-card accent-blue">
+          <div class="mini-label">English Chesapeake</div>
+          <h3>Indentured Servitude</h3>
+          <div class="exam-copy">
+            <p>Servants labored for a set term in exchange for passage. Conditions were harsh, but survivors could
+              gain land and political rights — over 75% of 1600s Chesapeake migrants arrived this way.</p>
+          </div>
+        </article>
+
+        <article class="exam-card accent-purple">
+          <div class="mini-label">Atlantic System</div>
+          <h3>The Middle Passage</h3>
+          <div class="exam-copy">
+            <p>The brutal ocean crossing for enslaved Africans, the middle leg of the triangular trade. Roughly
+              one-fifth of those aboard often died during the voyage.</p>
+          </div>
+        </article>
+
+        <article class="exam-card accent-teal">
+          <div class="mini-label">Why the Shift</div>
+          <h3>Africans Over Native Labor</h3>
+          <div class="exam-copy">
+            <p>Native people knew the land and could escape more easily; disease decimated Indigenous populations
+              by as much as 85–95% in some regions; Africans were removed from familiar territory and networks.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-content" id="encounters">
+      <header class="page-header">
+        <span class="unit-tag">Ongoing Negotiation</span>
+        <h2>Cultural Encounters</h2>
+        <p>Cooperation, conflict, and syncretism on both sides of contact</p>
+      </header>
+
+      <div class="writing-grid">
+        <article class="writing-card accent-teal">
+          <div class="mini-label">Cooperation</div>
+          <h3>Trade, Alliance, Exchange</h3>
+          <div class="writing-copy">
+            <p>Europeans depended on Native knowledge, food, and guidance; both sides formed alliances against
+              rivals. Cooperation was rarely equal — Europeans usually sought long-term dominance.</p>
+          </div>
+        </article>
+
+        <article class="writing-card accent-red">
+          <div class="mini-label">Conflict</div>
+          <h3>Land, Labor, Religion</h3>
+          <div class="writing-copy">
+            <p>Land hunger, labor demands, forced conversion, and retaliatory cycles of violence drove recurring
+              conflict — Indigenous resistance to colonization is a constant Period 1 theme.</p>
+          </div>
+        </article>
+
+        <article class="writing-card accent-gold">
+          <div class="mini-label">Syncretism</div>
+          <h3>Blending Under Pressure</h3>
+          <div class="writing-copy">
+            <p>Native and African peoples blended their own traditions with Christianity — as in religions like
+              voodoo — often reshaping imposed practices rather than simply accepting them.</p>
+          </div>
+        </article>
+
+        <article class="writing-card accent-blue">
+          <div class="mini-label">Resistance</div>
+          <h3>Maroon Communities</h3>
+          <div class="writing-copy">
+            <p>Some enslaved people escaped to form independent Maroon communities, preserving cultural practices
+              and resisting the Atlantic slave system directly.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-content" id="jamestown">
+      <header class="page-header">
+        <span class="unit-tag">1607 and Beyond</span>
+        <h2>Jamestown and Early English Colonies</h2>
+        <p>Virginia Company · headright · Burgesses · Chesapeake vs. New England</p>
+      </header>
+
+      <div class="structure-grid">
+        <article class="feature-card accent-gold">
+          <div class="card-sub">Founding</div>
+          <div class="card-title">A Business Venture</div>
+          <div class="feature-copy">
+            <p>The Virginia Company founded Jamestown seeking profit. Early settlers, many ill-suited gentlemen
+              searching for gold, faced starvation and disease — more than half died within three months.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-orange">
+          <div class="card-sub">Turning Point</div>
+          <div class="card-title">Rolfe and Tobacco</div>
+          <div class="feature-copy">
+            <p>John Rolfe married Pocahontas, easing tensions, and pioneered large-scale tobacco cultivation — a
+              land- and labor-hungry cash crop that pushed colonists to expand and rely on coerced labor.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-blue">
+          <div class="card-sub">1618 &amp; 1619</div>
+          <div class="card-title">Headright and Burgesses</div>
+          <div class="feature-copy">
+            <p>The headright system granted roughly 50 acres to attract settlers. In 1619 Virginia created the
+              House of Burgesses, the first representative assembly in English North America.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-purple">
+          <div class="card-sub">Further North</div>
+          <div class="card-title">Plymouth and Massachusetts Bay</div>
+          <div class="feature-copy">
+            <p>Separatists founded Plymouth in 1620 under the Mayflower Compact; Puritans arrived during the Great
+              Migration (1629–1642), led by John Winthrop's vision of a "city upon a hill."</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="two-col-list">
+        <div class="list-panel">
+          <h4>Chesapeake Pattern</h4>
+          <ul>
+            <li>Mostly single male migrants seeking profit.</li>
+            <li>Dispersed tobacco plantations, not towns.</li>
+            <li>Growing reliance on indentured and enslaved labor.</li>
+          </ul>
+        </div>
+        <div class="list-panel">
+          <h4>New England Pattern</h4>
+          <ul>
+            <li>Whole families migrated together.</li>
+            <li>Tighter town-and-meetinghouse communities.</li>
+            <li>Far less reliance on enslaved labor than the South.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-content" id="timeline">
+      <header class="page-header">
+        <span class="unit-tag">Chronology</span>
+        <h2>Period 1 Timeline</h2>
+        <p>Anchor causes and effects to dates</p>
+      </header>
+
+      <div class="timeline-intro">Horizontal study rail: scroll across the timeline from Norse contact to the House
+        of Burgesses.</div>
+
+      <div class="timeline">
+        <article class="timeline-item">
+          <div class="timeline-year">c. 1000</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Norse Voyages</strong>
+            <ul class="bullet-list">
+              <li>Reach modern Canada, centuries before Columbus.</li>
+              <li>Shows 1492 was not the first European arrival.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1492</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Columbus Reaches the Caribbean</strong>
+            <ul class="bullet-list">
+              <li>Encounters the Taíno; claims land for Spain.</li>
+              <li>Opens sustained, large-scale Atlantic contact.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1494</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Treaty of Tordesillas</strong>
+            <ul class="bullet-list">
+              <li>Spain and Portugal divide Atlantic claims.</li>
+              <li>Made without Indigenous consent.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1501</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Early African Slavery in Spanish Colonies</strong>
+            <ul class="bullet-list">
+              <li>Enslaved Africans arrive under Spanish colonization.</li>
+              <li>Predates English colonization by over a century.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1519</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Cortés vs. the Aztec Empire</strong>
+            <ul class="bullet-list">
+              <li>Relies on Indigenous alliances against Aztec rule.</li>
+              <li>Disease accelerates Aztec collapse.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1532</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Pizarro vs. the Inca Empire</strong>
+            <ul class="bullet-list">
+              <li>Exploits internal Inca political division.</li>
+              <li>Completes Spain's dominance in South America.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1565</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">St. Augustine Founded</strong>
+            <ul class="bullet-list">
+              <li>Oldest continuously occupied European settlement in the future U.S.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1587</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Roanoke Colony</strong>
+            <ul class="bullet-list">
+              <li>Sponsored by Sir Walter Raleigh.</li>
+              <li>Vanished by 1590 — the "Lost Colony."</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1607</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Jamestown Founded</strong>
+            <ul class="bullet-list">
+              <li>First permanent English settlement.</li>
+              <li>Marks the end of Period 1.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1608</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Quebec City Founded</strong>
+            <ul class="bullet-list">
+              <li>Anchors French trade and diplomacy in North America.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1618–1619</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Headright &amp; House of Burgesses</strong>
+            <ul class="bullet-list">
+              <li>Headright system grants land to attract settlers.</li>
+              <li>Burgesses becomes the first representative assembly.</li>
+              <li>1619 also marks the start of slavery in English North America.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1620</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Plymouth &amp; the Mayflower Compact</strong>
+            <ul class="bullet-list">
+              <li>Separatists found Plymouth in modern Massachusetts.</li>
+              <li>Compact ties government legitimacy to consent.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1629–1642</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Great Puritan Migration</strong>
+            <ul class="bullet-list">
+              <li>Puritans settle Massachusetts Bay under John Winthrop.</li>
+              <li>"City upon a hill" frames a religious mission.</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-content" id="glossary">
+      <header class="page-header">
+        <span class="unit-tag">Term Bank</span>
+        <h2>Glossary and Flashcards</h2>
+        <p>Filter terms, then flip cards for active recall</p>
+      </header>
+
+      <div class="glossary-toolbar">
+        <input id="glossaryFilter" type="text" placeholder="Filter glossary terms" />
+      </div>
+      <div class="glossary-grid" id="glossaryGrid"></div>
+
+      <div style="height: 26px;"></div>
+
+      <div class="flash-grid" id="flashGrid"></div>
+    </section>
+
+    <section class="tab-content" id="writing">
+      <header class="page-header">
+        <span class="unit-tag">AP Writing</span>
+        <h2>How Period 1 Appears in SAQs, LEQs, and DBQs</h2>
+        <p>Use evidence to support reasoning, not to decorate an answer</p>
+      </header>
+
+      <div class="writing-grid">
+        <article class="writing-card accent-gold">
+          <div class="mini-label">Use This Pattern</div>
+          <h3>Evidence + Reasoning</h3>
+          <div class="writing-copy">
+            <p>Claim: European empires pursued different colonial strategies based on their economic goals.</p>
+            <p>Evidence: Spain built missions and encomienda around conquest; France built alliances around the fur
+              trade.</p>
+            <p>Reasoning: Because trade required Native cooperation, France had stronger incentives to maintain
+              diplomacy than Spain did.</p>
+          </div>
+        </article>
+
+        <article class="writing-card accent-blue">
+          <div class="mini-label">Typical Prompt Move</div>
+          <h3>Explain Cause and Effect</h3>
+          <div class="writing-copy">
+            <p>High-scoring answers link a specific cause to a specific effect — for example, tobacco's demand for
+              land and labor directly pushed expansion and coerced labor systems in the Chesapeake.</p>
+          </div>
+        </article>
+
+        <article class="writing-card accent-red">
+          <div class="mini-label">What To Avoid</div>
+          <h3>Listing Without Linking</h3>
+          <div class="writing-copy">
+            <p>Do not list Columbian Exchange items or European motives without explaining impact. The prompt
+              usually wants causation, comparison, or continuity and change — not a list.</p>
+          </div>
+        </article>
+
+        <article class="writing-card accent-teal">
+          <div class="mini-label">DBQ Sourcing</div>
+          <h3>Point of View, Purpose, Audience</h3>
+          <div class="writing-copy">
+            <p>A Spanish priest describing Native labor should be read with attention to religious goals and
+              imperial politics — sourcing earns points that summary alone cannot.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="quizModal">
+    <div class="modal-box">
+      <button class="modal-close" type="button" data-close="quizModal">Close</button>
+      <div class="modal-title">Period 1 Quiz</div>
+      <div class="modal-sub">8 AP-style review questions</div>
+      <div id="quizMount"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="essayModal">
+    <div class="modal-box">
+      <button class="modal-close" type="button" data-close="essayModal">Close</button>
+      <div class="modal-title">Prompt Bank</div>
+      <div class="modal-sub">Short outlines for common Period 1 argument patterns</div>
+      <div class="essay-list" id="essayTopics"></div>
+      <div class="essay-outline" id="essayOutline"></div>
+    </div>
+  </div>
+  <script>
+    const tabs = [
+      { id: "dashboard", label: "Dashboard", icon: "◈", ambient: "radial-gradient(ellipse at 60% 10%, rgba(201,168,76,.12), transparent 65%)" },
+      { id: "notes", label: "Notes", icon: "☰", ambient: "radial-gradient(ellipse at 35% 18%, rgba(201,168,76,.14), transparent 65%)" },
+      { id: "peoples", label: "Native Nations", icon: "✦", ambient: "radial-gradient(ellipse at 20% 20%, rgba(91,143,212,.12), transparent 65%)" },
+      { id: "exploration", label: "Exploration", icon: "⛵", ambient: "radial-gradient(ellipse at 80% 20%, rgba(242,135,73,.12), transparent 65%)" },
+      { id: "exchange", label: "Columbian Exchange", icon: "◇", ambient: "radial-gradient(ellipse at 25% 70%, rgba(62,184,154,.12), transparent 65%)" },
+      { id: "empires", label: "Empires Compared", icon: "◩", ambient: "radial-gradient(ellipse at 75% 35%, rgba(155,134,244,.12), transparent 65%)" },
+      { id: "labor", label: "Labor & Slavery", icon: "▣", ambient: "radial-gradient(ellipse at 40% 25%, rgba(217,95,95,.12), transparent 65%)" },
+      { id: "encounters", label: "Cultural Encounters", icon: "◎", ambient: "radial-gradient(ellipse at 50% 50%, rgba(62,184,154,.12), transparent 65%)" },
+      { id: "jamestown", label: "Jamestown & New England", icon: "▦", ambient: "radial-gradient(ellipse at 70% 70%, rgba(201,168,76,.12), transparent 65%)" },
+      { id: "timeline", label: "Timeline", icon: "↗", ambient: "radial-gradient(ellipse at 55% 60%, rgba(242,135,73,.12), transparent 65%)" },
+      { id: "glossary", label: "Glossary", icon: "⌘", ambient: "radial-gradient(ellipse at 30% 30%, rgba(201,168,76,.12), transparent 65%)" },
+      { id: "writing", label: "Writing", icon: "✎", ambient: "radial-gradient(ellipse at 65% 28%, rgba(217,95,95,.12), transparent 65%)" }
+    ];
+
+    const glossaryTerms = [
+      { term: "Bering Land Bridge", def: "The land connection exposed between Siberia and Alaska during a colder climate, submerged as seas rose; the traditional explanation for early migration to the Americas.", tab: "peoples" },
+      { term: "Pueblo Peoples", def: "Southwest nations who built settled towns supported by irrigated maize, bean, and squash agriculture in an arid climate.", tab: "peoples" },
+      { term: "Iroquois Confederacy (Haudenosaunee)", def: "A multi-nation political alliance in the Northeast that managed diplomacy and conflict among member nations before and after contact.", tab: "peoples" },
+      { term: "Cahokia", def: "A major Mississippi Valley mound-building settlement showing large populations and long-distance trade centuries before 1491.", tab: "peoples" },
+      { term: "Caravel", def: "A maneuverable European ship design that, along with the compass and astrolabe, made long ocean voyages more reliable.", tab: "exploration" },
+      { term: "Treaty of Tordesillas (1494)", def: "An agreement, backed by the Pope, in which Spain and Portugal divided claims to Atlantic lands without any Indigenous consent.", tab: "exploration" },
+      { term: "Taíno", def: "The Indigenous people of the Caribbean whom Columbus encountered in 1492.", tab: "exploration" },
+      { term: "Joint-Stock Company", def: "A shareholder-funded business venture, such as the Virginia Company, used to spread the financial risk of colonization.", tab: "exploration" },
+      { term: "\u201cGold, Glory, and God\u201d", def: "A shorthand for the intertwined economic, political, and religious motives driving European exploration and colonization.", tab: "exploration" },
+      { term: "Columbian Exchange", def: "The large-scale transfer of plants, animals, people, and disease between the Old World and New World after 1492.", tab: "exchange" },
+      { term: "Smallpox & Demographic Collapse", def: "Old World diseases that devastated Indigenous populations with little immunity, weakening resistance to conquest and destabilizing leadership.", tab: "exchange" },
+      { term: "Global Silver Trade", def: "Spanish silver extraction from the Americas that linked the Americas, Europe, and Asia into a more interconnected global economy.", tab: "exchange" },
+      { term: "Encomienda System", def: "A Spanish labor system granting colonists authority over Native people in exchange for supposed protection and conversion, in practice often as brutal as slavery.", tab: "empires" },
+      { term: "Mission System", def: "Spanish religious outposts used to convert Native peoples to Christianity, often suppressing Indigenous belief systems.", tab: "empires" },
+      { term: "Bartolomé de las Casas", def: "A Spanish priest who condemned the brutality of encomienda and Spanish treatment of Native peoples.", tab: "empires" },
+      { term: "Indentured Servitude", def: "A labor system in which a servant worked a set term in exchange for passage; the dominant Chesapeake labor system before large-scale slavery.", tab: "labor" },
+      { term: "Middle Passage", def: "The brutal Atlantic crossing endured by enslaved Africans, during which roughly one-fifth often died.", tab: "labor" },
+      { term: "Transatlantic Slave Trade", def: "The forced transport and sale of enslaved Africans across the Atlantic, which expanded as colonial labor demands grew.", tab: "labor" },
+      { term: "Race-Based Slavery", def: "A labor and legal system that used constructed racial ideas to justify permanent, hereditary enslavement of Africans over other labor sources.", tab: "labor" },
+      { term: "Syncretism", def: "The blending of religious or cultural traditions, as when enslaved Africans merged West African practices with Christianity.", tab: "encounters" },
+      { term: "Maroon Communities", def: "Independent communities formed by enslaved people who escaped bondage, representing an early form of resistance.", tab: "encounters" },
+      { term: "Virginia Company", def: "The joint-stock company that funded and founded Jamestown in 1607 in search of profit.", tab: "jamestown" },
+      { term: "John Rolfe & Tobacco", def: "The settler who pioneered large-scale tobacco cultivation, a land- and labor-hungry cash crop that helped save Jamestown and drove expansion.", tab: "jamestown" },
+      { term: "Headright System", def: "A Virginia policy (1618) granting roughly 50 acres of land to settlers who paid their own passage or brought over laborers, used to attract migrants.", tab: "jamestown" },
+      { term: "House of Burgesses", def: "The first representative assembly in English North America, created in Virginia in 1619.", tab: "jamestown" },
+      { term: "Roanoke Colony (\u201cLost Colony\u201d)", def: "An English settlement sponsored by Sir Walter Raleigh in 1587 that had vanished without explanation by 1590.", tab: "jamestown" },
+      { term: "Mayflower Compact", def: "An agreement signed by Plymouth's Separatist settlers in 1620 that tied government legitimacy to the consent of the governed.", tab: "jamestown" },
+      { term: "Great Migration (Puritan)", def: "The wave of Puritan settlement into Massachusetts Bay between 1629 and 1642 under Governor John Winthrop.", tab: "jamestown" }
+    ];
+
+    const flashcards = [
+      {
+        front: "Why does 1492 matter more than the Norse voyages around 1000?",
+        back: "The Norse reached modern Canada centuries earlier, so Columbus was not the first European contact. What makes 1492 transformative is that it starts sustained, large-scale Atlantic contact rather than an isolated voyage."
+      },
+      {
+        front: "How did Spanish and French colonial approaches differ?",
+        back: "Spain pursued conquest, missions, and coerced labor (encomienda) to extract wealth and convert Native peoples. France relied on a smaller number of settlers and fur-trade partnerships, which encouraged diplomacy and intermarriage with Native nations."
+      },
+      {
+        front: "Why did colonists shift from Native to African forced labor?",
+        back: "Native people knew the land and could escape more easily, disease sharply reduced Indigenous populations, and Africans were removed from familiar territory and support networks. Colonists also used constructed racial ideas to rationalize enslavement."
+      },
+      {
+        front: "Chesapeake vs. New England settlement patterns?",
+        back: "The Chesapeake drew mostly single male migrants into dispersed, profit-driven tobacco plantations reliant on coerced labor. New England drew whole families into tighter town-and-meetinghouse communities with far less reliance on enslaved labor."
+      },
+      {
+        front: "What made the encomienda system different from outright slavery in theory?",
+        back: "Encomienda legally required colonists to protect and convert the Native people under their authority in exchange for labor and tribute. In practice, though, treatment was frequently just as brutal as slavery."
+      }
+    ];
+
+    const quizQuestions = [
+      {
+        question: "What does the Bering Land Bridge theory explain?",
+        options: ["Why the Aztec Empire fell", "How early humans likely migrated into the Americas", "Why Spain and Portugal divided Atlantic land", "How horses spread across the Plains"],
+        correct: 1,
+        explanation: "Lower sea levels during a colder climate exposed a land connection between Siberia and Alaska, offering a traditional explanation for early migration into the Americas."
+      },
+      {
+        question: "Which combination best describes the motives behind European exploration?",
+        options: ["Only economic profit", "Economic, religious, and political motives together", "Only a desire to spread Christianity", "Only competition with the Ottoman Empire"],
+        correct: 1,
+        explanation: "Exploration was driven by overlapping economic goals (trade and land), religious duty (spreading Christianity), and political rivalry between competing European monarchies."
+      },
+      {
+        question: "What did the Treaty of Tordesillas (1494) accomplish?",
+        options: ["It ended the transatlantic slave trade", "It divided Atlantic land claims between Spain and Portugal", "It created the House of Burgesses", "It established the encomienda system"],
+        correct: 1,
+        explanation: "Spain and Portugal, with papal backing, drew a line dividing claims to Atlantic lands, entirely without Indigenous consent."
+      },
+      {
+        question: "What was the most consequential effect of the Columbian Exchange on Native populations?",
+        options: ["Population growth from new crops", "Catastrophic mortality from diseases like smallpox", "Immediate political unity among Native nations", "A rapid decline in European interest in colonization"],
+        correct: 1,
+        explanation: "Old World diseases such as smallpox caused catastrophic mortality among Indigenous peoples with little immunity, weakening resistance to conquest and destabilizing leadership."
+      },
+      {
+        question: "Under the Spanish encomienda system, colonists received",
+        options: ["Ownership of land only, with no authority over people", "Authority over Native people in exchange for supposed protection and conversion", "A guaranteed seat in the House of Burgesses", "Direct control over the transatlantic slave trade"],
+        correct: 1,
+        explanation: "Encomienda granted colonists authority over Native people, who were nominally protected and converted in exchange for forced labor and tribute — often as brutal as slavery in practice."
+      },
+      {
+        question: "Which factor best explains the shift from Indigenous to African forced labor in English colonies?",
+        options: ["Africans were more willing to work", "Native people knew the land and could escape more easily, while disease had devastated Indigenous populations", "The Bill of Rights required it", "Enslaved Africans demanded better treatment"],
+        correct: 1,
+        explanation: "Familiarity with local terrain made escape easier for Native people, and disease had already sharply reduced Indigenous populations, pushing colonists toward the growing transatlantic slave trade."
+      },
+      {
+        question: "What was the primary purpose of Virginia's headright system?",
+        options: ["To punish indentured servants", "To attract settlers by granting land", "To fund the House of Burgesses", "To end the tobacco economy"],
+        correct: 1,
+        explanation: "The headright system granted roughly 50 acres of land per settler to attract migrants and laborers to Virginia."
+      },
+      {
+        question: "The Mayflower Compact is most significant because it",
+        options: ["Abolished slavery in New England", "Tied government legitimacy to the consent of the governed", "Created the first cash crop economy", "Established the encomienda system in New England"],
+        correct: 1,
+        explanation: "Plymouth's Separatist settlers agreed that their government's authority rested on the consent of the community, an early expression of self-government."
+      }
+    ];
+
+    const essayOutlines = [
+      {
+        label: "Explain why colonial labor systems shifted from Indigenous coercion to African slavery",
+        blocks: [
+          ["Claim", "English colonists shifted from Indigenous coerced labor and indentured servitude toward African chattel slavery because Native and indentured labor could not reliably meet the growing demands of cash-crop agriculture."],
+          ["Evidence", "Use disease-driven Indigenous population decline, Native familiarity with the land enabling escape, the decline of indentured servitude, and the expanding tobacco economy in the Chesapeake."],
+          ["Reasoning", "Because planters needed a large, controllable, and renewable labor force for land- and labor-hungry crops like tobacco, they turned to a labor source that was harder to escape and could be legally bound for life."],
+          ["Counterpoint", "This shift was not immediate or uniform — indentured servants still made up the majority of Chesapeake migrants through much of the 1600s, and slavery expanded gradually rather than all at once."]
+        ]
+      },
+      {
+        label: "Compare Spanish and English models of colonization",
+        blocks: [
+          ["Claim", "Spain and England pursued different colonial models because they sought different goals from the Americas: Spain prioritized conquest and extraction, while England prioritized permanent agricultural settlement."],
+          ["Spanish Model", "Conquest, missions, and the encomienda system produced large-scale disruption of Native societies alongside forced religious conversion."],
+          ["English Model", "Settler colonization aimed at family farmland created high land pressure, displacement of Native nations, and frequent conflict, especially once cash crops like tobacco expanded demand for land and labor."],
+          ["Outcome", "Both models disrupted Native societies and relied on coerced labor, but Spain's approach centered on controlling existing populations, while England's approach centered on displacing them to make room for settlers."]
+        ]
+      },
+      {
+        label: "Explain the effects of the Columbian Exchange on both sides of the Atlantic",
+        blocks: [
+          ["Claim", "The Columbian Exchange transformed populations, economies, and ecosystems on both sides of the Atlantic, though its effects were far more devastating in the Americas than in Europe."],
+          ["Evidence", "Point to smallpox and Indigenous demographic collapse, the introduction of horses and livestock to the Americas, and the spread of New World crops like corn and potatoes to Europe, Africa, and Asia."],
+          ["Reasoning", "Because Indigenous peoples had no prior exposure to Old World diseases, mortality was catastrophic and destabilized political structures, while Europeans gained new food sources that supported population growth without comparable losses."],
+          ["Link", "This imbalance in the Exchange's effects helped enable European conquest, since demographic collapse weakened Indigenous resistance at the same time European populations were growing."]
+        ]
+      }
+    ];
+
+    const nav = document.getElementById("sidebarNav");
+    const ambientOverlay = document.getElementById("ambientOverlay");
+    const main = document.getElementById("main");
+    const cursor = document.getElementById("cursor");
+    const pinBtn = document.getElementById("pinBtn");
+    const sidebar = document.getElementById("sidebar");
+    const apToggleBtn = document.getElementById("apToggleBtn");
+    const bestScoreEl = document.getElementById("bestScore");
+    let currentTab = "dashboard";
+    let quizIndex = 0;
+    let quizScore = 0;
+    let quizLocked = false;
+
+    function renderNav() {
+      nav.innerHTML = tabs.map((tab) => `
+        <button class="nav-btn ${tab.id === currentTab ? "active" : ""}" data-tab="${tab.id}" type="button">
+          <span class="nav-indicator"></span>
+          <span class="nav-icon">${tab.icon}</span>
+          <span class="nav-label">${tab.label}</span>
+        </button>
+      `).join("");
+    }
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll(".tab-content").forEach((section) => {
+        section.classList.toggle("active", section.id === tabId);
+      });
+      document.querySelectorAll(".nav-btn").forEach((button) => {
+        button.classList.toggle("active", button.dataset.tab === tabId);
+      });
+      const tab = tabs.find((entry) => entry.id === tabId);
+      if (tab) ambientOverlay.style.background = tab.ambient;
+      main.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderGlossary(filter = "") {
+      const value = filter.toLowerCase().trim();
+      const items = glossaryTerms.filter((term) => {
+        return term.term.toLowerCase().includes(value) || term.def.toLowerCase().includes(value);
+      });
+      document.getElementById("glossaryGrid").innerHTML = items.map((item) => `
+        <article class="feature-card glossary-card" data-target-tab="${item.tab}">
+          <div class="mini-label">${item.tab}</div>
+          <h4>${item.term}</h4>
+          <div class="body-copy">${item.def}</div>
+        </article>
+      `).join("");
+    }
+
+    function renderFlashcards() {
+      document.getElementById("flashGrid").innerHTML = flashcards.map((card) => `
+        <article class="flash-card" tabindex="0">
+          <div class="flash-inner">
+            <div class="flash-front">
+              <div>
+                <div class="mini-label">Prompt</div>
+                <h3>${card.front}</h3>
+              </div>
+              <div class="flash-hint">Click to reveal</div>
+            </div>
+            <div class="flash-back">
+              <div>
+                <div class="mini-label">Answer</div>
+                <div class="body-copy">${card.back}</div>
+              </div>
+              <div class="flash-hint">Click to flip back</div>
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderEssayTopics() {
+      document.getElementById("essayTopics").innerHTML = essayOutlines.map((outline, index) => `
+        <button class="essay-topic-btn" type="button" data-essay-index="${index}">${outline.label}</button>
+      `).join("");
+      document.getElementById("essayOutline").classList.remove("show");
+      document.getElementById("essayOutline").innerHTML = "";
+    }
+
+    function selectEssay(index) {
+      document.querySelectorAll(".essay-topic-btn").forEach((btn) => {
+        btn.classList.toggle("active", Number(btn.dataset.essayIndex) === index);
+      });
+      const outline = essayOutlines[index];
+      document.getElementById("essayOutline").innerHTML = outline.blocks.map(([label, body]) => `
+        <div class="essay-block">
+          <div class="essay-block-label">${label}</div>
+          <div class="essay-block-body">${body}</div>
+        </div>
+      `).join("");
+      document.getElementById("essayOutline").classList.add("show");
+    }
+
+    function renderQuizQuestion() {
+      const quizMount = document.getElementById("quizMount");
+      const q = quizQuestions[quizIndex];
+      if (!q) {
+        const pct = Math.round((quizScore / quizQuestions.length) * 100);
+        const prevBest = Number(localStorage.getItem("apush_u1_best") || 0);
+        const best = Math.max(prevBest, pct);
+        localStorage.setItem("apush_u1_best", String(best));
+        bestScoreEl.textContent = best + "%";
+        quizMount.innerHTML = `
+          <div class="quiz-status">Complete</div>
+          <div class="quiz-question">Score: ${quizScore} / ${quizQuestions.length}</div>
+          <div class="quiz-feedback">Use the glossary and prompt bank if you missed anything tied to ratification, federalism, or clause analysis.</div>
+          <div class="quiz-next"><button class="glass-btn" id="restartQuizBtn" type="button">Restart Quiz</button></div>
+        `;
+        return;
+      }
+      quizLocked = false;
+      quizMount.innerHTML = `
+        <div class="quiz-status">Question ${quizIndex + 1} of ${quizQuestions.length}</div>
+        <div class="quiz-question">${q.question}</div>
+        <div class="quiz-options">
+          ${q.options.map((option, index) => `<button class="quiz-option" type="button" data-option-index="${index}">${option}</button>`).join("")}
+        </div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+        <div class="quiz-next" id="quizNext"></div>
+      `;
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add("open");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("open");
+    }
+
+    function initBestScore() {
+      const best = localStorage.getItem("apush_u1_best");
+      bestScoreEl.textContent = best ? best + "%" : "--";
+    }
+
+    renderNav();
+    renderGlossary();
+    renderFlashcards();
+    renderEssayTopics();
+    initBestScore();
+
+    document.addEventListener("mousemove", (event) => {
+      if (!window.matchMedia("(pointer:fine)").matches) return;
+      cursor.style.left = event.clientX + "px";
+      cursor.style.top = event.clientY + "px";
+    });
+
+    document.addEventListener("mouseover", (event) => {
+      if (!window.matchMedia("(pointer:fine)").matches) return;
+      const interactive = event.target.closest("button, a, .flash-card, .glossary-card");
+      cursor.style.width = interactive ? "20px" : "12px";
+      cursor.style.height = interactive ? "20px" : "12px";
+    });
+
+    pinBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("pinned");
+      pinBtn.classList.toggle("pinned");
+      pinBtn.textContent = sidebar.classList.contains("pinned") ? "Pinned" : "Pin";
+    });
+
+    nav.addEventListener("click", (event) => {
+      const button = event.target.closest(".nav-btn");
+      if (!button) return;
+      switchTab(button.dataset.tab);
+    });
+
+    document.querySelectorAll(".note-jump").forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = document.getElementById(button.dataset.noteTarget);
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+    document.getElementById("glossaryFilter").addEventListener("input", (event) => {
+      renderGlossary(event.target.value);
+    });
+
+    document.getElementById("flashGrid").addEventListener("click", (event) => {
+      const card = event.target.closest(".flash-card");
+      if (card) card.classList.toggle("flipped");
+    });
+
+    document.getElementById("openSearch").addEventListener("click", () => {
+      const panel = document.getElementById("sbSearchPanel");
+      panel.classList.toggle("open");
+      if (panel.classList.contains("open")) document.getElementById("sbInput").focus();
+    });
+
+    document.getElementById("sbInput").addEventListener("input", (event) => {
+      const query = event.target.value.toLowerCase().trim();
+      const matches = glossaryTerms.filter((entry) => {
+        return entry.term.toLowerCase().includes(query) || entry.def.toLowerCase().includes(query);
+      }).slice(0, 8);
+      document.getElementById("sbResults").innerHTML = matches.length ? matches.map((item) => `
+        <div class="sb-result" data-target-tab="${item.tab}" data-target-term="${item.term}">
+          <div class="sb-result-tab">${item.tab}</div>
+          <div class="sb-result-term">${item.term}</div>
+          <div class="sb-result-snip">${item.def}</div>
+        </div>
+      `).join("") : `<div class="sb-result"><div class="sb-result-snip">No matches.</div></div>`;
+    });
+
+    document.getElementById("sbResults").addEventListener("click", (event) => {
+      const result = event.target.closest(".sb-result");
+      if (!result || !result.dataset.targetTab) return;
+      switchTab(result.dataset.targetTab);
+      document.getElementById("sbSearchPanel").classList.remove("open");
+      document.getElementById("sbInput").value = "";
+      document.getElementById("sbResults").innerHTML = "";
+      if (result.dataset.targetTab === "glossary") {
+        document.getElementById("glossaryFilter").value = result.dataset.targetTerm;
+        renderGlossary(result.dataset.targetTerm);
+      }
+    });
+
+    document.getElementById("glossaryGrid").addEventListener("click", (event) => {
+      const card = event.target.closest(".glossary-card");
+      if (!card) return;
+      switchTab(card.dataset.targetTab);
+    });
+
+    apToggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("ap-highlight");
+      apToggleBtn.classList.toggle("active");
+    });
+
+    document.getElementById("quizOpenBtn").addEventListener("click", () => {
+      quizIndex = 0;
+      quizScore = 0;
+      renderQuizQuestion();
+      openModal("quizModal");
+    });
+
+    document.getElementById("essayOpenBtn").addEventListener("click", () => {
+      renderEssayTopics();
+      openModal("essayModal");
+    });
+
+    document.getElementById("essayTopics").addEventListener("click", (event) => {
+      const button = event.target.closest(".essay-topic-btn");
+      if (!button) return;
+      selectEssay(Number(button.dataset.essayIndex));
+    });
+
+    document.getElementById("quizMount").addEventListener("click", (event) => {
+      const option = event.target.closest(".quiz-option");
+      if (option && !quizLocked) {
+        quizLocked = true;
+        const q = quizQuestions[quizIndex];
+        const selected = Number(option.dataset.optionIndex);
+        document.querySelectorAll(".quiz-option").forEach((btn, index) => {
+          if (index === q.correct) btn.classList.add("correct");
+          if (index === selected && selected !== q.correct) btn.classList.add("wrong");
+        });
+        if (selected === q.correct) quizScore += 1;
+        document.getElementById("quizFeedback").textContent = q.explanation;
+        document.getElementById("quizNext").innerHTML = `<button class="glass-btn" id="nextQuizBtn" type="button">${quizIndex === quizQuestions.length - 1 ? "See Score" : "Next Question"}</button>`;
+      }
+      if (event.target.id === "nextQuizBtn") {
+        quizIndex += 1;
+        renderQuizQuestion();
+      }
+      if (event.target.id === "restartQuizBtn") {
+        quizIndex = 0;
+        quizScore = 0;
+        renderQuizQuestion();
+      }
+    });
+
+    document.querySelectorAll("[data-close]").forEach((button) => {
+      button.addEventListener("click", () => closeModal(button.dataset.close));
+    });
+
+    document.querySelectorAll(".modal").forEach((modal) => {
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) modal.classList.remove("open");
+      });
+    });
+
+    main.addEventListener("scroll", () => {
+      const max = main.scrollHeight - main.clientHeight;
+      const pct = max > 0 ? (main.scrollTop / max) * 100 : 0;
+      document.getElementById("readingProgressFill").style.width = pct + "%";
+    });
+  </script>
+
+</body>
+</html>
