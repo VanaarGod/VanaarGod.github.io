@@ -1,0 +1,2889 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AP US History — Period 2 (1607–1754)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #07080a;
+      --card: #0d0f12;
+      --card2: #12161c;
+      --border: rgba(255, 255, 255, 0.07);
+      --text: #dde3ec;
+      --muted: #7a8699;
+      --gold: #7fa66b;
+      --teal: #3eb89a;
+      --blue: #5b8fd4;
+      --red: #d95f5f;
+      --orange: #f28749;
+      --purple: #9b86f4;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "DM Mono", monospace;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: .35;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #cursor {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--gold);
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: difference;
+      transition: width .2s ease, height .2s ease;
+    }
+
+    #readingProgress {
+      position: fixed;
+      top: 0;
+      left: 72px;
+      right: 0;
+      height: 2px;
+      z-index: 100;
+    }
+
+    #readingProgressFill {
+      width: 0%;
+      height: 100%;
+      background: var(--gold);
+    }
+
+    #ambientOverlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 60% 10%, rgba(201, 168, 76, .12), transparent 65%);
+      opacity: .1;
+      pointer-events: none;
+      transition: background 1s ease, opacity .25s ease;
+      z-index: 0;
+    }
+
+    #sidebar {
+      width: 72px;
+      height: 100vh;
+      flex-shrink: 0;
+      background: rgba(5, 6, 8, .84);
+      border-right: 1px solid var(--border);
+      backdrop-filter: blur(24px);
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+      transition: width .4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    #sidebar:hover,
+    #sidebar.pinned {
+      width: 264px;
+    }
+
+    #pinBtn {
+      position: absolute;
+      top: 12px;
+      right: 10px;
+      padding: 4px 7px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 8px;
+      letter-spacing: .08em;
+      opacity: 0;
+      cursor: none;
+      transition: opacity .25s ease, color .2s ease, border-color .2s ease;
+    }
+
+    #sidebar:hover #pinBtn,
+    #sidebar.pinned #pinBtn {
+      opacity: 1;
+    }
+
+    #pinBtn.pinned {
+      color: var(--gold);
+      border-color: rgba(201, 168, 76, .24);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      border: 1px solid rgba(201, 168, 76, .2);
+      background: rgba(201, 168, 76, .07);
+      color: var(--gold);
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+
+    .logo-copy {
+      opacity: 0;
+      transition: opacity .25s ease;
+    }
+
+    #sidebar:hover .logo-copy,
+    #sidebar.pinned .logo-copy {
+      opacity: 1;
+    }
+
+    .logo-copy h1 {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 13px;
+      letter-spacing: .25em;
+      color: var(--gold);
+    }
+
+    .logo-copy p {
+      color: var(--muted);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .search-wrap {
+      position: relative;
+      padding: 10px;
+    }
+
+    .sb-search-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .03);
+      color: var(--muted);
+      cursor: none;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease, border-color .2s ease;
+    }
+
+    #sidebar:hover .sb-search-trigger,
+    #sidebar.pinned .sb-search-trigger {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sb-search-trigger:hover {
+      border-color: rgba(201, 168, 76, .2);
+    }
+
+    #sbSearchPanel {
+      position: absolute;
+      top: calc(100% - 4px);
+      left: 10px;
+      right: 10px;
+      border: 1px solid rgba(201, 168, 76, .18);
+      background: rgba(8, 10, 13, .98);
+      border-radius: 12px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity .22s ease, transform .22s ease;
+      z-index: 80;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, .65);
+    }
+
+    #sbSearchPanel.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    #sbSearchInner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, .05);
+    }
+
+    #sbInput {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 10px;
+      letter-spacing: .1em;
+      outline: none;
+      cursor: none;
+    }
+
+    #sbResults {
+      max-height: 280px;
+      overflow: auto;
+    }
+
+    .sb-result {
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, .04);
+      cursor: none;
+      transition: background .15s ease;
+    }
+
+    .sb-result:hover {
+      background: rgba(201, 168, 76, .06);
+    }
+
+    .sb-result:last-child {
+      border-bottom: none;
+    }
+
+    .sb-result-tab {
+      font-size: 8px;
+      color: var(--gold);
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .sb-result-term {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 14px;
+      color: white;
+      letter-spacing: .04em;
+    }
+
+    .sb-result-snip {
+      font-family: "Crimson Pro", serif;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-top: 2px;
+    }
+
+    nav {
+      height: calc(100vh - 176px);
+      padding: 0 10px 14px;
+      overflow: auto;
+    }
+
+    .nav-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      cursor: none;
+      white-space: nowrap;
+      transition: background .2s ease, color .2s ease;
+      position: relative;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, .03);
+      color: #aeb7c6;
+    }
+
+    .nav-btn.active {
+      background: rgba(201, 168, 76, .07);
+      color: var(--gold);
+    }
+
+    .nav-btn.active .nav-indicator {
+      opacity: 1;
+    }
+
+    .nav-indicator {
+      position: absolute;
+      left: 0;
+      width: 2px;
+      height: 24px;
+      background: var(--gold);
+      border-radius: 5px;
+      opacity: 0;
+    }
+
+    .nav-label {
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity .25s ease;
+    }
+
+    #sidebar:hover .nav-label,
+    #sidebar.pinned .nav-label {
+      opacity: 1;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 9px;
+      letter-spacing: .1em;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .sidebar-footer span:last-child {
+      opacity: 0;
+      transition: opacity .25s ease;
+    }
+
+    #sidebar:hover .sidebar-footer span:last-child,
+    #sidebar.pinned .sidebar-footer span:last-child {
+      opacity: 1;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: blink 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    #main {
+      flex: 1;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 36px 54px 80px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+      padding: 8px 0 20px;
+      backdrop-filter: blur(8px);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .glass-btn,
+    #scoreTracker {
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(255, 255, 255, .05);
+      color: var(--muted);
+      padding: 9px 14px;
+      font: inherit;
+      font-size: 9px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      cursor: none;
+      backdrop-filter: blur(12px);
+      transition: border-color .2s ease, color .2s ease, background .2s ease;
+      white-space: nowrap;
+    }
+
+    .glass-btn:hover,
+    #scoreTracker:hover {
+      color: var(--gold);
+      border-color: rgba(201, 168, 76, .26);
+    }
+
+    .glass-btn.active {
+      color: var(--gold);
+      border-color: rgba(201, 168, 76, .32);
+      background: rgba(201, 168, 76, .08);
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeUp .45s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .page-header {
+      margin-bottom: 34px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .unit-tag {
+      display: block;
+      color: var(--gold);
+      font-size: 10px;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .page-header h2 {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(38px, 5vw, 62px);
+      letter-spacing: .08em;
+      line-height: .96;
+      color: white;
+    }
+
+    .page-header p {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .hero-grid,
+    .principle-grid,
+    .case-grid,
+    .exam-grid,
+    .democracy-grid,
+    .structure-grid,
+    .federal-grid,
+    .writing-grid,
+    .glossary-grid,
+    .flash-grid {
+      display: grid;
+      gap: 22px;
+    }
+
+    .hero-grid {
+      grid-template-columns: 1.15fr .85fr;
+      margin-bottom: 26px;
+    }
+
+    .democracy-grid,
+    .structure-grid,
+    .case-grid,
+    .writing-grid,
+    .flash-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .principle-grid,
+    .federal-grid,
+    .glossary-grid {
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .exam-grid {
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    }
+
+    .card,
+    .feature-card,
+    .principle-card,
+    .case-card,
+    .exam-card,
+    .flash-card,
+    .timeline-item,
+    .writing-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      transition: transform .24s ease, border-color .24s ease, box-shadow .24s ease;
+    }
+
+    .card:hover,
+    .feature-card:hover,
+    .principle-card:hover,
+    .case-card:hover,
+    .exam-card:hover,
+    .flash-card:hover,
+    .timeline-item:hover,
+    .writing-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, .14);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, .35);
+    }
+
+    .hero-card::before,
+    .feature-card::before,
+    .principle-card::before,
+    .case-card::before,
+    .exam-card::before,
+    .writing-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 2px;
+      background: var(--accent, var(--gold));
+      opacity: .6;
+    }
+
+    .hero-card {
+      --accent: var(--gold);
+    }
+
+    .accent-blue {
+      --accent: var(--blue);
+    }
+
+    .accent-teal {
+      --accent: var(--teal);
+    }
+
+    .accent-red {
+      --accent: var(--red);
+    }
+
+    .accent-orange {
+      --accent: var(--orange);
+    }
+
+    .accent-purple {
+      --accent: var(--purple);
+    }
+
+    .card-sub {
+      color: var(--accent, var(--gold));
+      font-size: 9px;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 28px;
+      letter-spacing: .05em;
+      color: white;
+      margin-bottom: 16px;
+    }
+
+    .body-copy,
+    .bullet-list,
+    .timeline-copy,
+    .case-copy,
+    .writing-copy,
+    .exam-copy,
+    .feature-copy {
+      font-family: "Crimson Pro", serif;
+      color: var(--muted);
+      line-height: 1.82;
+      font-size: 15px;
+    }
+
+    .body-copy p+p,
+    .feature-copy p+p,
+    .case-copy p+p,
+    .writing-copy p+p,
+    .exam-copy p+p {
+      margin-top: 12px;
+    }
+
+    .bullet-list {
+      padding-left: 18px;
+    }
+
+    .bullet-list li+li {
+      margin-top: 10px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 18px;
+    }
+
+    .tag {
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, .07);
+      background: rgba(255, 255, 255, .03);
+      color: var(--muted);
+      font-size: 7px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .dash-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .stat-box {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .02);
+      padding: 16px;
+    }
+
+    .stat-box span {
+      display: block;
+      color: var(--muted);
+      font-size: 8px;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .stat-box strong {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 26px;
+      letter-spacing: .06em;
+      color: white;
+    }
+
+    .focus-callout {
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(201, 168, 76, .16);
+      background: rgba(201, 168, 76, .05);
+    }
+
+    .focus-callout .label {
+      color: var(--gold);
+      font-size: 8px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .principle-card h3,
+    .case-card h3,
+    .exam-card h3,
+    .flash-front h3,
+    .timeline-year,
+    .writing-card h3 {
+      font-family: "Bebas Neue", sans-serif;
+      color: white;
+      letter-spacing: .05em;
+    }
+
+    .principle-card h3,
+    .case-card h3,
+    .exam-card h3,
+    .writing-card h3 {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .timeline-year {
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+
+    .mini-label {
+      color: var(--gold);
+      font-size: 8px;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    .two-col-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .list-panel {
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .02);
+    }
+
+    .list-panel h4 {
+      color: white;
+      font-size: 11px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .list-panel ul {
+      padding-left: 18px;
+      font-family: "Crimson Pro", serif;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .timeline {
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+    }
+
+    .timeline-item {
+      min-width: 320px;
+      max-width: 360px;
+      flex: 0 0 320px;
+      border-left: 2px solid rgba(201, 168, 76, .22);
+      padding-left: 24px;
+      scroll-snap-align: start;
+      background:
+        linear-gradient(180deg, rgba(201, 168, 76, .04), transparent 40%),
+        var(--card);
+    }
+
+    .timeline-copy {
+      margin-top: 8px;
+    }
+
+    .timeline-copy ul {
+      margin-top: 10px;
+      padding-left: 18px;
+    }
+
+    .timeline-copy li+li {
+      margin-top: 6px;
+    }
+
+    .course-link {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .notes-shell {
+      display: grid;
+      grid-template-columns: minmax(230px, 300px) 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .notes-index {
+      position: sticky;
+      top: 88px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, .025);
+      padding: 18px;
+    }
+
+    .notes-index-title {
+      color: var(--accent, var(--blue));
+      font-size: 9px;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .note-jump {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 0;
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-align: left;
+      text-transform: uppercase;
+      cursor: none;
+    }
+
+    .note-jump:last-child {
+      border-bottom: none;
+    }
+
+    .note-jump span:last-child {
+      color: var(--muted);
+    }
+
+    .note-jump:hover {
+      color: var(--accent, var(--blue));
+    }
+
+    .notes-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .note-section {
+      scroll-margin-top: 110px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--card);
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .note-section::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent, var(--blue));
+      opacity: .7;
+    }
+
+    .note-section h3 {
+      font-family: "Bebas Neue", sans-serif;
+      color: white;
+      font-size: 30px;
+      letter-spacing: .05em;
+      margin-bottom: 12px;
+    }
+
+    .note-section h4 {
+      font-family: "Bebas Neue", sans-serif;
+      color: white;
+      font-size: 21px;
+      letter-spacing: .05em;
+      margin: 18px 0 8px;
+    }
+
+    .note-section .body-copy+.body-copy {
+      margin-top: 12px;
+    }
+
+    .note-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .mini-note {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .025);
+      padding: 16px;
+    }
+
+    .mini-note>strong {
+      display: block;
+      color: white;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 19px;
+      letter-spacing: .05em;
+      margin-bottom: 8px;
+    }
+
+    .timeline-intro {
+      margin-bottom: 18px;
+      padding: 18px 20px;
+      border: 1px solid rgba(201, 168, 76, .14);
+      border-radius: 16px;
+      background: rgba(201, 168, 76, .04);
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .glossary-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .glossary-toolbar input {
+      min-width: 260px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .03);
+      color: var(--text);
+      padding: 11px 14px;
+      font: inherit;
+      font-size: 10px;
+      letter-spacing: .1em;
+      outline: none;
+      cursor: none;
+    }
+
+    .glossary-card h4 {
+      font-family: "Bebas Neue", sans-serif;
+      color: white;
+      font-size: 22px;
+      letter-spacing: .04em;
+      margin-bottom: 12px;
+    }
+
+    .flash-card {
+      perspective: 1000px;
+      cursor: none;
+      min-height: 240px;
+    }
+
+    .flash-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 184px;
+      transform-style: preserve-3d;
+      transition: transform .55s ease;
+    }
+
+    .flash-card.flipped .flash-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flash-front,
+    .flash-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .flash-back {
+      transform: rotateY(180deg);
+    }
+
+    .flash-hint {
+      color: var(--muted);
+      font-size: 8px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(3, 4, 6, .74);
+      backdrop-filter: blur(16px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .22s ease;
+      z-index: 120;
+    }
+
+    .modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      width: min(760px, calc(100vw - 32px));
+      max-height: min(84vh, 920px);
+      overflow: auto;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, .1);
+      background: rgba(10, 12, 16, .96);
+      padding: 28px;
+      box-shadow: 0 36px 90px rgba(0, 0, 0, .55);
+    }
+
+    .modal-close {
+      float: right;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 9px;
+      letter-spacing: .14em;
+      cursor: none;
+    }
+
+    .modal-title {
+      font-family: "Bebas Neue", sans-serif;
+      color: white;
+      font-size: 38px;
+      letter-spacing: .06em;
+      margin-bottom: 8px;
+    }
+
+    .modal-sub {
+      color: var(--gold);
+      font-size: 9px;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .quiz-status {
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .quiz-question {
+      font-family: "Crimson Pro", serif;
+      color: white;
+      font-size: 24px;
+      line-height: 1.35;
+      margin-bottom: 20px;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .quiz-option {
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .03);
+      color: var(--text);
+      font: inherit;
+      font-size: 11px;
+      letter-spacing: .04em;
+      cursor: none;
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .quiz-option:hover {
+      border-color: rgba(201, 168, 76, .2);
+    }
+
+    .quiz-option.correct {
+      border-color: rgba(62, 184, 154, .35);
+      background: rgba(62, 184, 154, .08);
+    }
+
+    .quiz-option.wrong {
+      border-color: rgba(217, 95, 95, .35);
+      background: rgba(217, 95, 95, .08);
+    }
+
+    .quiz-feedback {
+      margin-top: 18px;
+      font-family: "Crimson Pro", serif;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .quiz-next {
+      margin-top: 18px;
+    }
+
+    .essay-list {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .essay-topic-btn {
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .03);
+      color: var(--text);
+      font: inherit;
+      font-size: 10px;
+      letter-spacing: .08em;
+      cursor: none;
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .essay-topic-btn:hover,
+    .essay-topic-btn.active {
+      border-color: rgba(201, 168, 76, .24);
+      background: rgba(201, 168, 76, .07);
+    }
+
+    .essay-outline {
+      display: none;
+      gap: 14px;
+    }
+
+    .essay-outline.show {
+      display: grid;
+    }
+
+    .essay-block {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .025);
+      padding: 18px;
+    }
+
+    .essay-block-label {
+      color: var(--gold);
+      font-size: 8px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      margin-bottom: 9px;
+    }
+
+    .essay-block-body {
+      font-family: "Crimson Pro", serif;
+      color: var(--muted);
+      line-height: 1.78;
+      font-size: 15px;
+    }
+
+    strong.ap-term {
+      color: #c9e0b8;
+      font-weight: 600;
+    }
+
+    body.ap-highlight strong.ap-term {
+      background: rgba(127, 166, 107, .16);
+      padding: 0 3px;
+      border-radius: 3px;
+      box-shadow: 0 0 10px rgba(127, 166, 107, .18);
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .2;
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1020px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dash-stats,
+      .two-col-list {
+        grid-template-columns: 1fr;
+      }
+
+      #main {
+        padding-left: 26px;
+        padding-right: 26px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        cursor: auto;
+        overflow: auto;
+        display: block;
+      }
+
+      #cursor,
+      #readingProgress {
+        display: none;
+      }
+
+      #sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      #sidebar:hover,
+      #sidebar.pinned {
+        width: 100%;
+      }
+
+      .logo-copy,
+      .nav-label,
+      .sidebar-footer span:last-child,
+      .sb-search-trigger {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+
+      #pinBtn {
+        display: none;
+      }
+
+      nav {
+        height: auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      #main {
+        height: auto;
+        overflow: visible;
+      }
+
+      .topbar {
+        position: static;
+      }
+
+      .glossary-toolbar input {
+        min-width: 100%;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+  <div id="cursor"></div>
+  <div id="ambientOverlay"></div>
+  <div id="readingProgress">
+    <div id="readingProgressFill"></div>
+  </div>
+
+  <aside id="sidebar">
+    <button id="pinBtn" type="button">Pin</button>
+    <div class="sidebar-logo">
+      <div class="logo-icon">AP</div>
+      <div class="logo-copy">
+        <h1>APUSH UNIT 2</h1>
+        <p>Colonial Society &amp; Empire</p>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <button class="sb-search-trigger" id="openSearch" type="button">⌕ <span>Search Unit 2</span></button>
+      <div id="sbSearchPanel">
+        <div id="sbSearchInner">
+          <span style="color: var(--gold); font-size: 12px;">⌕</span>
+          <input id="sbInput" type="text" placeholder="Find people, terms, or themes" />
+        </div>
+        <div id="sbResults"></div>
+      </div>
+    </div>
+
+    <nav id="sidebarNav"></nav>
+
+    <div class="sidebar-footer">
+      <span class="dot"></span>
+      <span>Study Mode Active</span>
+    </div>
+  </aside>
+
+  <main id="main">
+    <div class="topbar">
+      <div class="top-actions">
+        <a class="glass-btn course-link" href="apush-index.html">Course Home</a>
+        <a class="glass-btn course-link" href="apush-unit1.html">Period 1</a>
+        <a class="glass-btn course-link" href="apush-unit2.html">Period 2</a>
+        <a class="glass-btn course-link" href="apush-unit3.html">Period 3</a>
+        <button class="glass-btn" id="apToggleBtn" type="button">AP Highlight</button>
+        <button class="glass-btn" id="quizOpenBtn" type="button">Launch Quiz</button>
+        <button class="glass-btn" id="essayOpenBtn" type="button">Prompt Bank</button>
+      </div>
+      <div id="scoreTracker">Best Quiz: <span id="bestScore">--</span></div>
+    </div>
+
+    <section class="tab-content active" id="dashboard">
+      <header class="page-header">
+        <span class="unit-tag">Period 2 · 1607–1754</span>
+        <h2>Colonial Society and Empire</h2>
+        <p>Regional development · Atlantic economy · slavery's expansion · self-government · religious revival</p>
+      </header>
+
+      <div class="hero-grid">
+        <article class="card hero-card">
+          <div class="card-sub">Core Frame</div>
+          <div class="card-title">What Period 2 Is Really About</div>
+          <div class="body-copy">
+            <p><strong class="ap-term">1607</strong>, the founding of Jamestown, opens more than a century of English
+              settlement that produced sharply different regional societies rather than one uniform "colonial
+              America." <strong class="ap-term">1754</strong>, the start of the <strong class="ap-term">French and
+                Indian War</strong>, closes the period because that war reshapes British imperial policy and sets up
+              the tensions of Period 3.</p>
+            <p>Treat colonization as negotiation among competing empires, Native nations, and colonists with
+              different goals — not a simple story of "settlers arrive and build colonies." Geography, founding
+              purpose, and labor demand explain why New England, the Chesapeake, the Middle Colonies, and the Lower
+              South diverged so sharply.</p>
+          </div>
+          <div class="dash-stats">
+            <div class="stat-box">
+              <span>Study Sections</span>
+              <strong>8</strong>
+            </div>
+            <div class="stat-box">
+              <span>Key Terms</span>
+              <strong>28</strong>
+            </div>
+            <div class="stat-box">
+              <span>Quiz Items</span>
+              <strong>8</strong>
+            </div>
+          </div>
+          <div class="focus-callout">
+            <div class="label">Exam Focus</div>
+            <div class="body-copy">
+              Build answers as chains: geography or founding goal → labor system or governance → regional identity
+              or conflict.
+            </div>
+          </div>
+        </article>
+
+        <article class="card feature-card accent-blue">
+          <div class="card-sub">Fast Review</div>
+          <div class="card-title">What You Must Be Able To Explain</div>
+          <ul class="bullet-list">
+            <li>Why New England, the Chesapeake, the Middle Colonies, and the Lower South developed such different
+              economies, labor systems, and societies.</li>
+            <li>How and why chattel slavery expanded and hardened into a racial, hereditary system.</li>
+            <li>How <strong class="ap-term">mercantilism</strong> and the <strong class="ap-term">Navigation
+                Acts</strong> shaped — and how <strong class="ap-term">salutary neglect</strong> loosened — British
+              control of the colonies.</li>
+            <li>How the <strong class="ap-term">First Great Awakening</strong> and Enlightenment ideas challenged
+              traditional authority.</li>
+            <li>How events like Bacon's Rebellion, the Pueblo Revolt, and King Philip's War reveal frontier
+              instability and Native agency.</li>
+            <li>Why 1754 marks a turning point in imperial and colonial relations.</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Regional Divergence</span>
+            <span class="tag">Slavery's Expansion</span>
+            <span class="tag">Salutary Neglect</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="exam-grid">
+        <article class="exam-card accent-red">
+          <div class="mini-label">Common Mistakes</div>
+          <h3>Avoid These</h3>
+          <ul class="bullet-list">
+            <li>Treating "the colonies" as a single, uniform society instead of distinct regions.</li>
+            <li>Calling New England town meetings or Virginia's Burgesses fully "democratic" without noting who was
+              excluded.</li>
+            <li>Describing the shift to slavery as sudden rather than gradual across the late 1600s and early 1700s.</li>
+            <li>Saying the Great Awakening "caused the Revolution" instead of describing it as one contributing
+              factor.</li>
+          </ul>
+        </article>
+
+        <article class="exam-card accent-teal">
+          <div class="mini-label">Study Strategy</div>
+          <h3>Best Order To Review</h3>
+          <ul class="bullet-list">
+            <li>Start with the Chesapeake and New England as a direct regional contrast.</li>
+            <li>Add the Middle Colonies and Lower South to complete the regional picture.</li>
+            <li>Study slavery and the Atlantic economy as one interconnected system.</li>
+            <li>Cover imperial policy — mercantilism, the Navigation Acts, salutary neglect.</li>
+            <li>Finish with religion, ideas, and the colonial wars leading to 1754.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+
+    <section class="tab-content" id="notes">
+      <header class="page-header">
+        <span class="unit-tag">Knowt-Style Notes</span>
+        <h2>Period 2 Notes Index</h2>
+        <p>Empires &amp; Native power · regions · slavery · self-government · religion · wars</p>
+      </header>
+
+      <div class="notes-shell">
+        <aside class="notes-index accent-gold" aria-label="Period 2 notes index">
+          <div class="notes-index-title">Major Buckets</div>
+          <button class="note-jump" type="button" data-note-target="u2-note-empires"><span>Competing Empires &amp;
+              Native Power</span><span>01</span></button>
+          <button class="note-jump" type="button" data-note-target="u2-note-chesapeake"><span>The
+              Chesapeake</span><span>02</span></button>
+          <button class="note-jump" type="button" data-note-target="u2-note-newengland"><span>New
+              England</span><span>03</span></button>
+          <button class="note-jump" type="button" data-note-target="u2-note-middle"><span>Middle
+              Colonies</span><span>04</span></button>
+          <button class="note-jump" type="button" data-note-target="u2-note-southcolonies"><span>The Lower
+              South</span><span>05</span></button>
+          <button class="note-jump" type="button" data-note-target="u2-note-slavery"><span>Slavery &amp; the
+              Atlantic World</span><span>06</span></button>
+          <button class="note-jump" type="button" data-note-target="u2-note-imperial"><span>Imperial Policy &amp;
+              Self-Government</span><span>07</span></button>
+          <button class="note-jump" type="button"
+            data-note-target="u2-note-religion"><span>Religion, Ideas &amp; Wars for Empire</span><span>08</span></button>
+        </aside>
+
+        <div class="notes-stack">
+          <article class="note-section accent-gold" id="u2-note-empires">
+            <div class="mini-label">01 · A Contested Continent</div>
+            <h3>Competing Empires and Native Power</h3>
+            <div class="body-copy">
+              <p>Period 2 is not a simple story of "settlers arrive and build colonies." It was a long contest among
+                <strong class="ap-term">Spanish, French, Dutch, and English</strong> empires, shaped at every turn by
+                Native American power, geography, and Atlantic economics. Each empire pursued overlapping goals —
+                wealth, territorial power, and religion or culture — but built very different colonial systems from
+                those shared motives.</p>
+              <p>Native nations were never a passive backdrop. Disease (especially smallpox) destabilized
+                communities and shifted regional power balances; access to European metal tools and weapons could
+                empower some nations over rivals; and most conflicts were ultimately about land, since English
+                settlers wanted permanent farms while many Native groups understood land as collectively used.
+                <strong class="ap-term">Borderlands</strong> — regions no single group fully controlled — became
+                spaces of trade, blending, and violence.</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Spain</strong>
+                <div class="body-copy">Extended a conquest-and-mission model from the Caribbean and Mexico into
+                  North American borderlands, often defensive and religious, backed by forced labor.</div>
+              </div>
+              <div class="mini-note"><strong>France</strong>
+                <div class="body-copy">Prioritized the fur trade, which meant prioritizing alliances with Native
+                  nations over dense settlement.</div>
+              </div>
+              <div class="mini-note"><strong>Netherlands</strong>
+                <div class="body-copy">Built New Netherland as a commerce-first colony centered on ports and
+                  trade.</div>
+              </div>
+              <div class="mini-note"><strong>England</strong>
+                <div class="body-copy">Developed a patchwork of profit-driven, religious, and proprietary colonies
+                  with significant regional diversity.</div>
+              </div>
+            </div>
+            <h4>AP Move</h4>
+            <div class="body-copy">Use the <strong class="ap-term">Pueblo Revolt (1680)</strong> — in which Pueblo
+              communities drove Spanish colonizers out of Santa Fe for over a decade — as concrete evidence that
+              colonization could be reversed, at least temporarily, through organized Indigenous action.</div>
+          </article>
+
+          <article class="note-section accent-red" id="u2-note-chesapeake">
+            <div class="mini-label">02 · Tobacco and Plantation Society</div>
+            <h3>The Chesapeake: Tobacco, Labor, and Bacon's Rebellion</h3>
+            <div class="body-copy">
+              <p><strong class="ap-term">Jamestown (1607)</strong> was founded by the Virginia Company as a
+                profit-seeking venture, not a religious refuge, and struggled early due to conflict with the
+                Powhatan Confederacy, disease, and unsafe water. Virginia stabilized once <strong class="ap-term">John
+                  Rolfe</strong> developed a marketable tobacco strain. Tobacco depleted soil quickly and demanded
+                land, creating a feedback loop: profits drew more migrants, migrants demanded more land, expansion
+                increased Native conflict, and conflict required militia coordination.</p>
+              <p>Early Chesapeake labor relied on <strong class="ap-term">indentured servants</strong> who traded a
+                term of labor for passage. Freed servants who competed for scarce coastal land and pushed onto the
+                frontier helped set up <strong class="ap-term">Bacon's Rebellion (1676)</strong>: frontier farmers,
+                led by Nathaniel Bacon, wanted permission to attack nearby Native groups after Governor
+                <strong class="ap-term">William Berkeley</strong> hesitated. Bacon's forces attacked the
+                Susquehannock and Pamunkey — English allies — then sacked and burned Jamestown itself before Bacon
+                died of dysentery. The rebellion exposed deep class conflict among colonists and pushed elites toward
+                a more controllable labor force: race-based, hereditary <strong class="ap-term">chattel
+                  slavery</strong>, which expanded gradually rather than overnight.</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Maryland</strong>
+                <div class="body-copy">A proprietary colony under Cecilius Calvert (Lord Baltimore), intended as a
+                  Catholic haven; the Act of Toleration (1649) protected Christian worship but tensions persisted.</div>
+              </div>
+              <div class="mini-note"><strong>House of Burgesses (1619)</strong>
+                <div class="body-copy">The first representative assembly in English North America — but political
+                  participation stayed sharply limited by property, gender, race, and status.</div>
+              </div>
+              <div class="mini-note"><strong>Elite Response</strong>
+                <div class="body-copy">Frontier insecurity and class resentment convinced planters that enslaved
+                  labor, bound for life, was safer than a growing population of angry landless freedmen.</div>
+              </div>
+            </div>
+            <h4>AP Move</h4>
+            <div class="body-copy">Explain Bacon's Rebellion through mechanism — frontier insecurity, unequal land
+              access, and elite resentment — not just the date, and treat the shift to slavery as gradual, not
+              sudden.</div>
+          </article>
+
+          <article class="note-section accent-blue" id="u2-note-newengland">
+            <div class="mini-label">03 · Towns, Church, and Dissent</div>
+            <h3>New England: Puritan Migration and Community Governance</h3>
+            <div class="body-copy">
+              <p><strong class="ap-term">Puritans</strong> sought to "purify" the Church of England and migrated in
+                large numbers during the <strong class="ap-term">Great Migration</strong> of the 1630s, founding
+                Massachusetts Bay under John Winthrop's vision of a <strong class="ap-term">"city upon a
+                  hill."</strong> Poor Chesapeake-style soil discouraged plantation agriculture, so New England's
+                economy centered on small farms, fishing, shipbuilding, and trade. Whole families migrated together,
+                supporting longer life expectancy and more stable, tightly knit town-and-meetinghouse communities
+                than the Chesapeake.</p>
+              <p>Political rights were often tied to church membership, and dissenters were banished — <strong
+                  class="ap-term">Roger Williams</strong> (who argued for separating church and state) founded Rhode
+                Island, and <strong class="ap-term">Anne Hutchinson</strong> was banished for challenging clergy
+                authority. Expansion produced the <strong class="ap-term">Pequot War</strong> and the devastating
+                <strong class="ap-term">King Philip's War (1675–1676)</strong>, led by Metacom. As religious fervor
+                cooled across generations, the <strong class="ap-term">Halfway Covenant (1662)</strong> allowed
+                baptism for children of baptized-but-unconverted parents, though full political participation still
+                required full church membership.</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Salem Witch Trials (1692)</strong>
+                <div class="body-copy">More than 130 accused witches were jailed or executed amid fear tied to the
+                  Dominion of New England's collapse, a new royal charter, and frontier war anxiety.</div>
+              </div>
+              <div class="mini-note"><strong>Fundamental Orders of Connecticut</strong>
+                <div class="body-copy">Founded with Thomas Hooker's help, sometimes cited as the first written
+                  constitution in British North America.</div>
+              </div>
+              <div class="mini-note"><strong>By 1700</strong>
+                <div class="body-copy">Women made up the majority of active church members, reflecting shifting
+                  religious participation as fervor declined among some men.</div>
+              </div>
+            </div>
+            <h4>AP Move</h4>
+            <div class="body-copy">Never call New England simply "democratic" — town meetings were real
+              participation, but rights were tied to church membership, gender, and race.</div>
+          </article>
+
+          <article class="note-section accent-teal" id="u2-note-middle">
+            <div class="mini-label">04 · Diversity and Commerce</div>
+            <h3>The Middle Colonies</h3>
+            <div class="body-copy">
+              <p>The Middle Colonies — New York, New Jersey, Pennsylvania, and Delaware — are best understood
+                through diversity and their role as an Atlantic crossroads. New York began as the Dutch colony of
+                <strong class="ap-term">New Netherland</strong>; Charles II seized it in 1664 and gave it to his
+                brother James, Duke of York. Dutch residents stayed on generous terms, helping explain New York's
+                lasting commercial character.</p>
+              <p><strong class="ap-term">Pennsylvania</strong>, founded by <strong class="ap-term">William
+                  Penn</strong> as a refuge for Quakers, promoted religious freedom and grew rapidly through active
+                advertising, drawing large numbers of German and Scots-Irish settlers alongside the English. Fertile
+                soil earned the region the nickname the <strong class="ap-term">"bread colonies"</strong> for
+                large-scale grain production, and port cities like Philadelphia and New York became hubs for
+                shipping, artisan labor, and trade — supporting a comparatively large middle class.</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Penn's Treaty</strong>
+                <div class="body-copy">Penn agreed to take only as much Delaware land as could be walked in three
+                  days; his son later hired marathon runners to claim far more — a lesson in how "treaties" could be
+                  manipulated.</div>
+              </div>
+              <div class="mini-note"><strong>Quaker Beliefs</strong>
+                <div class="body-copy">Emphasized the "inner light," spiritual equality, and pacifism — ideals that
+                  shaped Pennsylvania's relatively tolerant reputation.</div>
+              </div>
+            </div>
+            <h4>AP Move</h4>
+            <div class="body-copy">Don't equate "diverse" with "equal" — explain diversity's causes (immigration,
+              trade, founding purpose) and its real limits.</div>
+          </article>
+
+          <article class="note-section accent-orange" id="u2-note-southcolonies">
+            <div class="mini-label">05 · Rice, Slavery, and Buffer Colonies</div>
+            <h3>The Lower South: Carolinas and Georgia</h3>
+            <div class="body-copy">
+              <p><strong class="ap-term">Carolina</strong> began as a proprietary colony and split into North and
+                South Carolina in 1729. South Carolina was settled largely by planters from <strong
+                  class="ap-term">Barbados</strong>, who brought Caribbean sugar-plantation expectations and helped
+                accelerate mainland slavery; the colony soon had a larger enslaved than free population, making it
+                one of the most slavery-dependent colonies in British North America.</p>
+              <p><strong class="ap-term">Georgia (1732)</strong>, founded under James Oglethorpe partly as a
+                military buffer against Spanish Florida, initially banned slavery — but the ban was overturned once
+                neighboring South Carolina's growth underscored slavery's profitability. Over time, Britain
+                converted many proprietary colonies into royal colonies to increase crown control; by the
+                Revolution, only Connecticut, Rhode Island, Pennsylvania, and Maryland remained non-royal.</div>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Rice &amp; Indigo</strong>
+                <div class="body-copy">Rice cultivation especially benefited from enslaved Africans' existing
+                  agricultural knowledge, deepening the region's reliance on forced labor.</div>
+              </div>
+              <div class="mini-note"><strong>North vs. South Carolina</strong>
+                <div class="body-copy">North Carolina drew settlers largely from Virginia; South Carolina's
+                  Barbadian roots pushed it toward plantation slavery much faster.</div>
+              </div>
+            </div>
+            <h4>AP Move</h4>
+            <div class="body-copy">Distinguish Chesapeake tobacco from Lower South rice and indigo plantations —
+              "the South" was not one uniform system.</div>
+          </article>
+
+          <article class="note-section accent-purple" id="u2-note-slavery">
+            <div class="mini-label">06 · Coercion and the Atlantic Economy</div>
+            <h3>Slavery and the Atlantic World</h3>
+            <div class="body-copy">
+              <p>The Atlantic world connected Europe, Africa, and the Americas through migration, trade, and empire.
+                Colonies exported tobacco, rice, indigo, fish, and lumber; Europe supplied manufactured goods; and
+                enslaved Africans were forcibly transported to supply labor. <strong class="ap-term">"Triangular
+                  trade"</strong> is best treated as a simplified model of overlapping routes, not one rigid path —
+                the key idea is interdependence across the ocean.</p>
+              <p>Slavery expanded because staple-crop agriculture demanded labor, indentured servitude declined
+                after unrest like Bacon's Rebellion, and enslaved labor generated major profits. Colonies gradually
+                built <strong class="ap-term">race-based, hereditary chattel slavery</strong> through law and
+                culture, defining enslaved people as property, making status pass through the mother, and
+                restricting movement and assembly. The <strong class="ap-term">Stono Rebellion (1739)</strong>,
+                near Charleston, South Carolina, was one of the most significant slave uprisings in British North
+                America — roughly 20 enslaved people seized weapons and tried to reach Spanish Florida before a
+                militia stopped them; the aftermath brought harsher slave codes across the colonies.</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Regional Variation</strong>
+                <div class="body-copy">Tied to tobacco in the Chesapeake, to rice and indigo in the Lower South, and
+                  smaller-scale in New England — though Northern merchants profited heavily from Atlantic commerce
+                  tied to slavery.</div>
+              </div>
+              <div class="mini-note"><strong>Resistance</strong>
+                <div class="body-copy">Ranged from daily acts like work slowdowns and cultural preservation to
+                  escape and organized rebellion such as Stono.</div>
+              </div>
+            </div>
+            <h4>AP Move</h4>
+            <div class="body-copy">Treat slavery as more than a labor supply — connect it to politics (elite power),
+              social order (racial hierarchy), and culture (fear of revolt, surveillance).</div>
+          </article>
+
+          <article class="note-section accent-gold" id="u2-note-imperial">
+            <div class="mini-label">07 · Regulation and Autonomy</div>
+            <h3>Imperial Policy and Colonial Self-Government</h3>
+            <div class="body-copy">
+              <p><strong class="ap-term">Mercantilism</strong> — the era's dominant economic theory — held that a
+                nation's power depended on a favorable balance of trade, so colonies existed to enrich the mother
+                country. Britain enforced this through the <strong class="ap-term">Navigation Acts
+                  (1651–1673)</strong>, which required colonists to trade mainly through England, plus laws like the
+                Wool Act (1699) and the widely evaded <strong class="ap-term">Molasses Act (1733)</strong>.</p>
+              <p>In practice, Britain often used absentee customs officials and inconsistent enforcement — a pattern
+                historians call <strong class="ap-term">salutary (benign) neglect</strong> — which let colonists
+                smuggle, bribe, or ignore rules and encouraged real self-government. Each colony had a
+                royal-or-proprietor-appointed governor who nonetheless depended on elected legislatures for money;
+                most colonies had bicameral legislatures, with a property-restricted lower house holding the "power
+                of the purse." When Britain did try to tighten control through the <strong class="ap-term">Dominion
+                  of New England (1686–1689)</strong>, colonists resisted, and the Dominion collapsed after the
+                Glorious Revolution.</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>New England Confederation</strong>
+                <div class="body-copy">A limited regional coordination effort with little real power, but a model
+                  for intercolonial cooperation.</div>
+              </div>
+              <div class="mini-note"><strong>West Indies Priority</strong>
+                <div class="body-copy">Britain often valued Caribbean sugar colonies more than mainland North
+                  America because of their enormous profits.</div>
+              </div>
+            </div>
+            <h4>AP Move</h4>
+            <div class="body-copy">Link mercantilist theory to specific laws (Navigation Acts, Molasses Act) and
+              then to the effect of weak enforcement: growing colonial autonomy and political expectations.</div>
+          </article>
+
+          <article class="note-section accent-teal" id="u2-note-religion">
+            <div class="mini-label">08 · Revival, Reason, and Rivalry</div>
+            <h3>Religion, Ideas, and Wars for Empire</h3>
+            <div class="body-copy">
+              <p>The <strong class="ap-term">First Great Awakening (1730s–1740s)</strong> was a wave of religious
+                revival emphasizing emotional, personal conversion over inherited church authority. <strong
+                  class="ap-term">Jonathan Edwards</strong> preached severe Calvinist doctrine, while <strong
+                  class="ap-term">George Whitefield</strong> drew huge crowds with emotionally intense preaching,
+                splitting communities into <strong class="ap-term">New Lights</strong> and <strong
+                  class="ap-term">Old Lights</strong>. By encouraging colonists to judge their own spiritual state,
+                the Awakening indirectly encouraged questioning of other hierarchies — without producing full
+                social equality. <strong class="ap-term">Enlightenment</strong> ideas about reason and natural law
+                circulated alongside revival religion; <strong class="ap-term">Benjamin Franklin</strong>, with
+                inventions like bifocals and the lightning rod and civic projects like a library and fire
+                department, embodied Enlightenment practicality.</p>
+              <p>Meanwhile, recurring wars — King William's War, Queen Anne's War, and King George's War — showed
+                that European rivalries regularly spilled into North America, with Native nations as decisive,
+                independent actors rather than mere "helpers." <strong class="ap-term">1754</strong> marks the start
+                of the <strong class="ap-term">French and Indian War</strong> (part of the global Seven Years' War)
+                and the end of Period 2, because that conflict reshapes British imperial policy going forward.</p>
+            </div>
+            <div class="note-grid">
+              <div class="mini-note"><strong>Why Intercolonial Unity Was Hard</strong>
+                <div class="body-copy">Regional economic differences, local political priorities, and competition
+                  for land and trade slowed cooperation before 1754.</div>
+              </div>
+              <div class="mini-note"><strong>Native Diplomacy</strong>
+                <div class="body-copy">Alliances with a European power could bring trade goods or military support,
+                  but also risked pulling Native communities into wars not their own.</div>
+              </div>
+            </div>
+            <h4>AP Move</h4>
+            <div class="body-copy">Frame colonial wars as European rivalry plus independent Native strategy, not
+              simply "British versus French" — and use 1754 as a clean bridge into Period 3.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="tab-content" id="regions">
+      <header class="page-header">
+        <span class="unit-tag">Regional Divergence</span>
+        <h2>Four Colonial Regions, Four Societies</h2>
+        <p>Geography and founding purpose shape economy, labor, and governance</p>
+      </header>
+
+      <div class="case-grid">
+        <article class="case-card accent-blue">
+          <div class="mini-label">Family Farms &amp; Towns</div>
+          <h3>New England</h3>
+          <div class="case-copy">
+            <p>Poor soil discouraged plantations, so small farms, fishing, and shipbuilding supported tight
+              town-and-meetinghouse communities built around Puritan congregations and family migration.</p>
+          </div>
+        </article>
+
+        <article class="case-card accent-red">
+          <div class="mini-label">Tobacco &amp; Plantations</div>
+          <h3>The Chesapeake</h3>
+          <div class="case-copy">
+            <p>Virginia and Maryland built a land- and labor-hungry tobacco economy around dispersed plantations,
+              first worked by indentured servants and increasingly by enslaved Africans.</p>
+          </div>
+        </article>
+
+        <article class="case-card accent-teal">
+          <div class="mini-label">Grain &amp; Ports</div>
+          <h3>Middle Colonies</h3>
+          <div class="case-copy">
+            <p>New York, New Jersey, and Pennsylvania combined fertile "bread colony" grain farming with busy port
+              cities, drawing an ethnically and religiously diverse population.</p>
+          </div>
+        </article>
+
+        <article class="case-card accent-orange">
+          <div class="mini-label">Rice, Indigo &amp; Slavery</div>
+          <h3>The Lower South</h3>
+          <div class="case-copy">
+            <p>The Carolinas and Georgia built plantation economies around rice and indigo, worked overwhelmingly by
+              enslaved labor, especially after Barbadian planters arrived in South Carolina.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="two-col-list">
+        <div class="list-panel">
+          <h4>Regions by Labor System</h4>
+          <ul>
+            <li>New England: family labor, limited slavery.</li>
+            <li>Chesapeake: indentured servitude shifting toward chattel slavery.</li>
+            <li>Middle Colonies: mixed free and enslaved labor.</li>
+            <li>Lower South: heavy reliance on enslaved labor.</li>
+          </ul>
+        </div>
+        <div class="list-panel">
+          <h4>Regions by Governance</h4>
+          <ul>
+            <li>New England: town meetings, church-linked participation.</li>
+            <li>Chesapeake: House of Burgesses, planter-elite politics.</li>
+            <li>Middle Colonies: proprietary and royal mixes, notably tolerant Pennsylvania.</li>
+            <li>Lower South: proprietary origins converting toward royal control.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-content" id="economy">
+      <header class="page-header">
+        <span class="unit-tag">Imperial Regulation</span>
+        <h2>Mercantilism and the Atlantic Economy</h2>
+        <p>Why Britain regulated colonial trade — and why enforcement stayed loose</p>
+      </header>
+
+      <div class="principle-grid">
+        <article class="principle-card accent-gold">
+          <div class="mini-label">Core Theory</div>
+          <h3>Mercantilism</h3>
+          <div class="body-copy">
+            <p>National power depended on a favorable balance of trade and control of hard currency. Under this
+              logic, colonies existed to enrich the mother country by supplying raw materials and buying finished
+              goods.</p>
+          </div>
+        </article>
+
+        <article class="principle-card accent-blue">
+          <div class="mini-label">1651–1673</div>
+          <h3>Navigation Acts</h3>
+          <div class="body-copy">
+            <p>Required colonists to trade mainly through England, restricted which goods could go where, and
+              limited colonial manufacturing of items already produced in England.</p>
+          </div>
+        </article>
+
+        <article class="principle-card accent-red">
+          <div class="mini-label">1733</div>
+          <h3>Molasses Act</h3>
+          <div class="body-copy">
+            <p>Taxed sugar imported from the French West Indies at a steep rate. New Englanders widely refused to
+              pay — an early, practical model for later resistance to Crown taxation.</p>
+          </div>
+        </article>
+
+        <article class="principle-card accent-teal">
+          <div class="mini-label">The System</div>
+          <h3>Triangular Trade</h3>
+          <div class="body-copy">
+            <p>Best understood as overlapping Atlantic trade routes rather than one rigid triangle: colonial raw
+              materials, European manufactured goods, and enslaved African labor all moved across the ocean in an
+              interdependent system.</p>
+          </div>
+        </article>
+
+        <article class="principle-card accent-purple">
+          <div class="mini-label">Loose Enforcement</div>
+          <h3>Salutary Neglect</h3>
+          <div class="body-copy">
+            <p>Britain regulated trade on paper but, using absentee customs officials, often ignored violations in
+              practice — encouraging smuggling and real colonial self-government.</p>
+          </div>
+        </article>
+
+        <article class="principle-card accent-orange">
+          <div class="mini-label">Priorities</div>
+          <h3>The West Indies Mattered More</h3>
+          <div class="body-copy">
+            <p>Britain frequently valued Caribbean sugar colonies above mainland North America because of their
+              enormous profits — mainland colonies mattered mainly as markets and raw-material suppliers.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-content" id="slavery">
+      <header class="page-header">
+        <span class="unit-tag">Coercion and Race</span>
+        <h2>Slavery's Expansion in British North America</h2>
+        <p>From indentured servitude to hereditary, race-based bondage</p>
+      </header>
+
+      <div class="structure-grid">
+        <article class="feature-card accent-red">
+          <div class="card-sub">Origins</div>
+          <div class="card-title">Present From the Start, Expanding Gradually</div>
+          <div class="feature-copy">
+            <p>Slavery existed in Virginia by 1619, but it expanded gradually. Settlers from Barbados brought a
+              working model of large-scale plantation slavery that accelerated its spread on the mainland.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-purple">
+          <div class="card-sub">Legal Construction</div>
+          <div class="card-title">Chattel Slavery Hardens Into Law</div>
+          <div class="feature-copy">
+            <p>Colonies gradually defined enslaved people as property for life, made status hereditary through the
+              mother, and restricted movement and assembly — building a racial hierarchy separating white freedom
+              from Black enslavement.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-teal">
+          <div class="card-sub">Not Identical Everywhere</div>
+          <div class="card-title">Regional Variation</div>
+          <div class="feature-copy">
+            <p>Tobacco tied slavery to the Chesapeake; rice and indigo tied it to the Lower South; New England's
+              enslaved population stayed smaller, though Northern merchants profited from Atlantic slave commerce.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-gold">
+          <div class="card-sub">1739</div>
+          <div class="card-title">The Stono Rebellion</div>
+          <div class="feature-copy">
+            <p>Roughly 20 enslaved people near Charleston seized weapons and tried to reach Spanish Florida before a
+              militia stopped them. The aftermath brought harsher slave codes and heightened colonial fear of
+              revolt.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-content" id="society">
+      <header class="page-header">
+        <span class="unit-tag">1700–1750</span>
+        <h2>Colonial Society: Growth, Gender, and City Life</h2>
+        <p>The colonies stop looking like "transplanted England"</p>
+      </header>
+
+      <div class="case-grid">
+        <article class="case-card accent-blue">
+          <div class="mini-label">1700 → 1750</div>
+          <h3>Rapid Population Growth</h3>
+          <div class="case-copy">
+            <p>Colonial population rose from about 250,000 to about 1,250,000, fueled by continued English
+              migration plus large numbers of Scots-Irish, Scots, and Germans; the Black population passed 200,000
+              by 1750.</p>
+          </div>
+        </article>
+
+        <article class="case-card accent-red">
+          <div class="mini-label">Rural Life</div>
+          <h3>Patriarchy and Limited Rights</h3>
+          <div class="case-copy">
+            <p>Over 90% of colonists lived in rural areas under patriarchal norms. Women generally could not vote,
+              draft a will, or testify in court, and labor was divided sharply along gender lines.</p>
+          </div>
+        </article>
+
+        <article class="case-card accent-teal">
+          <div class="mini-label">Regional Variation</div>
+          <h3>Black Life and Community</h3>
+          <div class="case-copy">
+            <p>Most Black colonists lived in the rural South, where enslaved people built extended kinship networks
+              as a survival strategy; smaller Northern populations made sustained community-building harder.</p>
+          </div>
+        </article>
+
+        <article class="case-card accent-gold">
+          <div class="mini-label">Cities &amp; Colleges</div>
+          <h3>Opportunity and Hardship</h3>
+          <div class="case-copy">
+            <p>Cities offered wider contact and education but also poverty and epidemics like smallpox. Harvard
+              (1636), the College of William and Mary (1693), and Yale (1701) mainly trained ministers.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="two-col-list">
+        <div class="list-panel">
+          <h4>Rural Experience</h4>
+          <ul>
+            <li>Subsistence farming with gendered division of labor.</li>
+            <li>Limited social contact outside the family unit.</li>
+            <li>Legal and political rights concentrated in propertied men.</li>
+          </ul>
+        </div>
+        <div class="list-panel">
+          <h4>Urban Experience</h4>
+          <ul>
+            <li>Wages often too low to escape poverty.</li>
+            <li>Primitive sanitation and recurring epidemics.</li>
+            <li>Greater exposure to ideas, print culture, and social change.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-content" id="government">
+      <header class="page-header">
+        <span class="unit-tag">Loose Reins</span>
+        <h2>Colonial Self-Government</h2>
+        <p>Governors, legislatures, and the limits of imperial control</p>
+      </header>
+
+      <div class="exam-grid">
+        <article class="exam-card accent-blue">
+          <div class="mini-label">Appointed, But Dependent</div>
+          <h3>Royal &amp; Proprietary Governors</h3>
+          <div class="exam-copy">
+            <p>Governors held king-like powers on paper but depended on colonial legislatures for funding, which in
+              practice forced cooperation and compromise.</p>
+          </div>
+        </article>
+
+        <article class="exam-card accent-teal">
+          <div class="mini-label">Power of the Purse</div>
+          <h3>Bicameral Legislatures</h3>
+          <div class="exam-copy">
+            <p>Most colonies (Pennsylvania was the main exception) had a property-restricted elected lower house
+              controlling taxation, and an appointed upper house drawn from the local elite.</p>
+          </div>
+        </article>
+
+        <article class="exam-card accent-purple">
+          <div class="mini-label">Limited Reach</div>
+          <h3>New England Confederation</h3>
+          <div class="exam-copy">
+            <p>An early regional coordination effort among northeastern colonies with little real authority, but a
+              model for intercolonial discussion of shared problems.</p>
+          </div>
+        </article>
+
+        <article class="exam-card accent-red">
+          <div class="mini-label">1686–1689</div>
+          <h3>Dominion of New England</h3>
+          <div class="exam-copy">
+            <p>An attempt to consolidate colonies and strengthen royal authority provoked resistance and collapsed
+              after the Glorious Revolution — evidence colonists would resist real centralization.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-content" id="religion">
+      <header class="page-header">
+        <span class="unit-tag">1730s–1740s</span>
+        <h2>The Great Awakening and Enlightenment Ideas</h2>
+        <p>Revival, reason, and a challenge to inherited authority</p>
+      </header>
+
+      <div class="writing-grid">
+        <article class="writing-card accent-gold">
+          <div class="mini-label">Revival</div>
+          <h3>The First Great Awakening</h3>
+          <div class="writing-copy">
+            <p>A wave of religious revival emphasizing emotional, personal conversion over inherited church
+              authority. Jonathan Edwards preached severe Calvinist doctrine; George Whitefield's dramatic preaching
+              drew massive crowds across the colonies.</p>
+          </div>
+        </article>
+
+        <article class="writing-card accent-blue">
+          <div class="mini-label">Community Split</div>
+          <h3>New Lights vs. Old Lights</h3>
+          <div class="writing-copy">
+            <p>Revivalism divided congregations between supporters of emotional revival (New Lights) and defenders
+              of traditional, educated clergy (Old Lights) — a recurring source of local conflict.</p>
+          </div>
+        </article>
+
+        <article class="writing-card accent-teal">
+          <div class="mini-label">Reason Alongside Revival</div>
+          <h3>The Enlightenment and Franklin</h3>
+          <div class="writing-copy">
+            <p>Enlightenment ideas about reason, natural law, and science circulated alongside revival religion.
+              Benjamin Franklin embodied practical Enlightenment thought through inventions, civic projects, and
+              later diplomacy.</p>
+          </div>
+        </article>
+
+        <article class="writing-card accent-red">
+          <div class="mini-label">Why It Mattered</div>
+          <h3>Questioning Authority — With Limits</h3>
+          <div class="writing-copy">
+            <p>If individuals could judge their own spiritual state, they might question other hierarchies too — but
+              the Awakening did not produce full social equality, and its effects varied widely by colony.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-content" id="conflict">
+      <header class="page-header">
+        <span class="unit-tag">Frontier &amp; Empire</span>
+        <h2>Rebellions, Native Resistance, and Wars for Empire</h2>
+        <p>Recurring instability on the path to 1754</p>
+      </header>
+
+      <div class="structure-grid">
+        <article class="feature-card accent-red">
+          <div class="card-sub">1676</div>
+          <div class="card-title">Bacon's Rebellion</div>
+          <div class="feature-copy">
+            <p>Frontier resentment toward coastal elites and unequal land access erupted into an attack on Native
+              allies and the burning of Jamestown, exposing deep class conflict among English colonists.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-orange">
+          <div class="card-sub">1680</div>
+          <div class="card-title">Pueblo Revolt</div>
+          <div class="feature-copy">
+            <p>Pueblo communities coordinated to drive Spanish colonizers out of Santa Fe for over a decade, proving
+              colonization could be reversed, at least temporarily.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-blue">
+          <div class="card-sub">1675–1676</div>
+          <div class="card-title">King Philip's War</div>
+          <div class="feature-copy">
+            <p>Led by Metacom, one of the deadliest wars relative to population in colonial history, devastating
+              Native communities and accelerating English land dispossession in New England.</p>
+          </div>
+        </article>
+
+        <article class="feature-card accent-purple">
+          <div class="card-sub">1689–1748</div>
+          <div class="card-title">Colonial Wars for Empire</div>
+          <div class="feature-copy">
+            <p>King William's War, Queen Anne's War, and King George's War show recurring patterns: European
+              rivalries spilling into North America, frontier raids, and shifting Native alliances built on
+              independent strategic goals.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="two-col-list">
+        <div class="list-panel">
+          <h4>Causes of Frontier Conflict</h4>
+          <ul>
+            <li>Expansion onto contested or Native-controlled land.</li>
+            <li>Unequal access to coastal land, pushing settlers to the frontier.</li>
+            <li>Weak intercolonial coordination against shared threats.</li>
+          </ul>
+        </div>
+        <div class="list-panel">
+          <h4>Path to 1754</h4>
+          <ul>
+            <li>Repeated European wars normalize North American frontier fighting.</li>
+            <li>Native nations act as independent, strategic powers, not mere allies.</li>
+            <li>1754 opens the French and Indian War, closing Period 2.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-content" id="timeline">
+      <header class="page-header">
+        <span class="unit-tag">Chronology</span>
+        <h2>Period 2 Timeline</h2>
+        <p>Anchor causes and effects to dates, from Jamestown to the French and Indian War</p>
+      </header>
+
+      <div class="timeline-intro">Horizontal study rail: scroll across the timeline from Jamestown's founding to
+        the opening of the French and Indian War.</div>
+
+      <div class="timeline">
+        <article class="timeline-item">
+          <div class="timeline-year">1607</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Jamestown Founded</strong>
+            <ul class="bullet-list">
+              <li>Virginia Company venture opens Period 2.</li>
+              <li>Struggles until tobacco cultivation takes hold.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1619</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Burgesses &amp; First Enslaved Africans</strong>
+            <ul class="bullet-list">
+              <li>House of Burgesses becomes the first representative assembly.</li>
+              <li>Marks the traditional start of slavery in English North America.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1620–1630s</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Plymouth &amp; the Great Migration</strong>
+            <ul class="bullet-list">
+              <li>Mayflower Compact (1620) ties government to consent.</li>
+              <li>Puritan Great Migration founds Massachusetts Bay.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1649</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Maryland's Act of Toleration</strong>
+            <ul class="bullet-list">
+              <li>Protects Christian worship in a Catholic-founded colony.</li>
+              <li>Religious conflict persists despite the law.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1662</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Halfway Covenant</strong>
+            <ul class="bullet-list">
+              <li>Loosens baptism rules as Puritan fervor cools.</li>
+              <li>Full political rights still tied to full church membership.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1664</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">New Netherland Becomes New York</strong>
+            <ul class="bullet-list">
+              <li>Charles II seizes the Dutch colony for his brother James.</li>
+              <li>Dutch residents remain, shaping New York's commerce.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1675–1676</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">King Philip's War</strong>
+            <ul class="bullet-list">
+              <li>Metacom leads one of the deadliest colonial-era wars.</li>
+              <li>Accelerates English dispossession of Native land.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1676</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Bacon's Rebellion</strong>
+            <ul class="bullet-list">
+              <li>Frontier settlers burn Jamestown over land and class grievances.</li>
+              <li>Accelerates the shift toward chattel slavery.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1680</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Pueblo Revolt</strong>
+            <ul class="bullet-list">
+              <li>Pueblo nations drive Spain out of Santa Fe.</li>
+              <li>Spanish control not restored for over a decade.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1686–1689</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Dominion of New England</strong>
+            <ul class="bullet-list">
+              <li>Attempt to consolidate colonies under royal control.</li>
+              <li>Collapses after the Glorious Revolution.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1692</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Salem Witch Trials</strong>
+            <ul class="bullet-list">
+              <li>More than 130 accused amid social and political stress.</li>
+              <li>Ends once elites turn against the accusers.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1732</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Georgia Founded</strong>
+            <ul class="bullet-list">
+              <li>Buffer colony against Spanish Florida under Oglethorpe.</li>
+              <li>Initial slavery ban is later overturned.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1733</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Molasses Act</strong>
+            <ul class="bullet-list">
+              <li>Taxes French West Indies sugar imports.</li>
+              <li>Widely evaded — an early pattern of colonial resistance.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1730s–1740s</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">First Great Awakening</strong>
+            <ul class="bullet-list">
+              <li>Edwards and Whitefield spark emotional religious revival.</li>
+              <li>Splits communities into New Lights and Old Lights.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1739</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">Stono Rebellion</strong>
+            <ul class="bullet-list">
+              <li>Enslaved rebels near Charleston seek freedom in Florida.</li>
+              <li>Triggers harsher slave codes across the colonies.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <div class="timeline-year">1754</div>
+          <div class="timeline-copy">
+            <strong class="ap-term">French and Indian War Begins</strong>
+            <ul class="bullet-list">
+              <li>Opens the North American theater of the Seven Years' War.</li>
+              <li>Marks the end of Period 2.</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-content" id="glossary">
+      <header class="page-header">
+        <span class="unit-tag">Term Bank</span>
+        <h2>Glossary and Flashcards</h2>
+        <p>Filter terms, then flip cards for active recall</p>
+      </header>
+
+      <div class="glossary-toolbar">
+        <input id="glossaryFilter" type="text" placeholder="Filter glossary terms" />
+      </div>
+      <div class="glossary-grid" id="glossaryGrid"></div>
+
+      <div style="height: 26px;"></div>
+
+      <div class="flash-grid" id="flashGrid"></div>
+    </section>
+
+    <section class="tab-content" id="writing">
+      <header class="page-header">
+        <span class="unit-tag">AP Writing</span>
+        <h2>How Period 2 Appears in SAQs, LEQs, and DBQs</h2>
+        <p>Use evidence to support reasoning, not to decorate an answer</p>
+      </header>
+
+      <div class="writing-grid">
+        <article class="writing-card accent-gold">
+          <div class="mini-label">Use This Pattern</div>
+          <h3>Evidence + Reasoning</h3>
+          <div class="writing-copy">
+            <p>Claim: English colonial regions developed distinct societies because of geography and founding
+              purpose.</p>
+            <p>Evidence: New England's poor soil produced family farms and towns; the Chesapeake's tobacco economy
+              produced dispersed plantations reliant on coerced labor.</p>
+            <p>Reasoning: Because environment shaped what colonists could grow and how they had to organize labor,
+              regions diverged even though they shared an English colonial framework.</p>
+          </div>
+        </article>
+
+        <article class="writing-card accent-blue">
+          <div class="mini-label">Typical Prompt Move</div>
+          <h3>Explain Cause and Effect</h3>
+          <div class="writing-copy">
+            <p>High-scoring answers link a specific cause to a specific effect — for example, Bacon's Rebellion's
+              class conflict directly pushed Chesapeake elites toward a more controllable, permanent labor force.</p>
+          </div>
+        </article>
+
+        <article class="writing-card accent-red">
+          <div class="mini-label">What To Avoid</div>
+          <h3>Listing Without Linking</h3>
+          <div class="writing-copy">
+            <p>Do not list the Navigation Acts or colonial wars without explaining their purpose or effect. The
+              prompt usually wants causation, comparison, or continuity and change — not a list.</p>
+          </div>
+        </article>
+
+        <article class="writing-card accent-teal">
+          <div class="mini-label">DBQ Sourcing</div>
+          <h3>Point of View, Purpose, Audience</h3>
+          <div class="writing-copy">
+            <p>A royal customs official describing colonial smuggling should be read with attention to imperial
+              goals and self-interest — sourcing earns points that summary alone cannot.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="quizModal">
+    <div class="modal-box">
+      <button class="modal-close" type="button" data-close="quizModal">Close</button>
+      <div class="modal-title">Period 2 Quiz</div>
+      <div class="modal-sub">8 AP-style review questions</div>
+      <div id="quizMount"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="essayModal">
+    <div class="modal-box">
+      <button class="modal-close" type="button" data-close="essayModal">Close</button>
+      <div class="modal-title">Prompt Bank</div>
+      <div class="modal-sub">Short outlines for common Period 2 argument patterns</div>
+      <div class="essay-list" id="essayTopics"></div>
+      <div class="essay-outline" id="essayOutline"></div>
+    </div>
+  </div>
+  <script>
+    const tabs = [
+      { id: "dashboard", label: "Dashboard", icon: "◈", ambient: "radial-gradient(ellipse at 60% 10%, rgba(127,166,107,.12), transparent 65%)" },
+      { id: "notes", label: "Notes", icon: "☰", ambient: "radial-gradient(ellipse at 35% 18%, rgba(127,166,107,.14), transparent 65%)" },
+      { id: "regions", label: "Colonial Regions", icon: "✦", ambient: "radial-gradient(ellipse at 20% 20%, rgba(91,143,212,.12), transparent 65%)" },
+      { id: "economy", label: "Mercantilism & Trade", icon: "⛵", ambient: "radial-gradient(ellipse at 80% 20%, rgba(242,135,73,.12), transparent 65%)" },
+      { id: "slavery", label: "Slavery's Expansion", icon: "◇", ambient: "radial-gradient(ellipse at 25% 70%, rgba(155,134,244,.12), transparent 65%)" },
+      { id: "society", label: "Colonial Society", icon: "◩", ambient: "radial-gradient(ellipse at 75% 35%, rgba(62,184,154,.12), transparent 65%)" },
+      { id: "government", label: "Self-Government", icon: "▣", ambient: "radial-gradient(ellipse at 40% 25%, rgba(91,143,212,.12), transparent 65%)" },
+      { id: "religion", label: "Awakening & Ideas", icon: "◎", ambient: "radial-gradient(ellipse at 50% 50%, rgba(127,166,107,.12), transparent 65%)" },
+      { id: "conflict", label: "Rebellion & War", icon: "▦", ambient: "radial-gradient(ellipse at 70% 70%, rgba(217,95,95,.12), transparent 65%)" },
+      { id: "timeline", label: "Timeline", icon: "↗", ambient: "radial-gradient(ellipse at 55% 60%, rgba(242,135,73,.12), transparent 65%)" },
+      { id: "glossary", label: "Glossary", icon: "⌘", ambient: "radial-gradient(ellipse at 30% 30%, rgba(127,166,107,.12), transparent 65%)" },
+      { id: "writing", label: "Writing", icon: "✎", ambient: "radial-gradient(ellipse at 65% 28%, rgba(217,95,95,.12), transparent 65%)" }
+    ];
+
+    const glossaryTerms = [
+      { term: "Salutary Neglect", def: "Britain's pattern of loosely enforced trade regulation before 1754, which encouraged smuggling and real colonial self-government.", tab: "economy" },
+      { term: "Mercantilism", def: "The dominant economic theory holding that national power depends on a favorable balance of trade; colonies existed to enrich the mother country.", tab: "economy" },
+      { term: "Navigation Acts (1651\u20131673)", def: "Laws requiring colonists to trade mainly through England and limiting colonial manufacturing of goods already produced there.", tab: "economy" },
+      { term: "Molasses Act (1733)", def: "A steep tax on French West Indies sugar imports that New Englanders widely refused to pay.", tab: "economy" },
+      { term: "Triangular Trade", def: "A simplified model of overlapping Atlantic trade routes connecting Europe, Africa, and the Americas through goods, capital, and enslaved people.", tab: "economy" },
+      { term: "Bacon's Rebellion (1676)", def: "A Virginia frontier uprising over land and elite neglect that ended with Jamestown burned and accelerated the shift toward chattel slavery.", tab: "conflict" },
+      { term: "Pueblo Revolt (1680)", def: "A coordinated Pueblo uprising that drove Spanish colonizers out of Santa Fe for more than a decade.", tab: "conflict" },
+      { term: "King Philip's War (1675\u20131676)", def: "A devastating New England war led by Metacom that accelerated English dispossession of Native land.", tab: "conflict" },
+      { term: "Chattel Slavery", def: "A labor and legal system treating enslaved Africans and their descendants as property for life, with status inherited through the mother.", tab: "slavery" },
+      { term: "Stono Rebellion (1739)", def: "A South Carolina slave uprising in which enslaved people tried to reach Spanish Florida; its suppression led to harsher slave codes.", tab: "slavery" },
+      { term: "Barbados Connection", def: "Migration of English planters from Barbados to South Carolina, which imported an established model of large-scale plantation slavery.", tab: "slavery" },
+      { term: "Halfway Covenant (1662)", def: "A Puritan policy allowing baptism for children of baptized-but-unconverted parents as religious fervor declined across generations.", tab: "regions" },
+      { term: "Great Migration (Puritan)", def: "The wave of Puritan settlement into Massachusetts Bay between roughly 1629 and 1642 under Governor John Winthrop.", tab: "regions" },
+      { term: "Town Meeting", def: "New England's local, participatory governing body, though political rights were often tied to church membership.", tab: "government" },
+      { term: "Roger Williams", def: "A Massachusetts dissenter banished for arguing for separation of church and state; founded Rhode Island.", tab: "regions" },
+      { term: "Anne Hutchinson", def: "A Puritan dissenter tried and banished for challenging clergy authority and emphasizing inner grace over conformity.", tab: "regions" },
+      { term: "Salem Witch Trials (1692)", def: "A mass hysteria episode in which more than 130 people were accused of witchcraft amid political and social stress.", tab: "regions" },
+      { term: "William Penn", def: "The Quaker founder of Pennsylvania, who promoted religious freedom and attracted German and Scots-Irish settlers through active advertising.", tab: "regions" },
+      { term: "New England Confederation", def: "A limited regional coordination effort among northeastern colonies with little formal power.", tab: "government" },
+      { term: "Dominion of New England (1686\u20131689)", def: "A failed attempt to consolidate colonies under tighter royal control that collapsed after the Glorious Revolution.", tab: "government" },
+      { term: "House of Burgesses", def: "The first representative assembly in English North America, created in Virginia in 1619.", tab: "regions" },
+      { term: "James Oglethorpe", def: "Founder of Georgia in 1732 as a military buffer against Spanish Florida; initially banned slavery there.", tab: "regions" },
+      { term: "First Great Awakening", def: "A wave of religious revival in the 1730s\u20131740s emphasizing emotional, personal conversion over inherited church authority.", tab: "religion" },
+      { term: "Jonathan Edwards", def: "A Congregationalist minister who preached severe, predeterministic Calvinist doctrine during the Great Awakening.", tab: "religion" },
+      { term: "George Whitefield", def: "A traveling preacher whose emotionally intense sermons drew massive intercolonial crowds during the Great Awakening.", tab: "religion" },
+      { term: "New Lights vs. Old Lights", def: "The division between supporters of emotional religious revival and defenders of traditional, educated clergy.", tab: "religion" },
+      { term: "Enlightenment", def: "An intellectual movement emphasizing reason, natural law, and scientific inquiry, embodied in the colonies by Benjamin Franklin.", tab: "religion" },
+      { term: "French and Indian War (1754)", def: "The North American theater of the global Seven Years' War; its 1754 start marks the end of Period 2.", tab: "conflict" }
+    ];
+
+    const flashcards = [
+      {
+        front: "Why did Bacon's Rebellion push Chesapeake elites toward slavery?",
+        back: "Frontier settlers and freed servants competing for scarce land turned on the colonial government, exposing dangerous class conflict among free colonists. Planters concluded that enslaved labor, bound for life and less able to claim political rights, was a more controllable long-term workforce."
+      },
+      {
+        front: "Why did New England and the Chesapeake diverge so sharply?",
+        back: "New England's poor soil discouraged plantations, so whole families settled tight, church-centered towns with mixed farming and trade. The Chesapeake's fertile tobacco land drew mostly single male migrants into dispersed, profit-driven plantations that depended on coerced labor."
+      },
+      {
+        front: "What was salutary neglect, and why did it matter?",
+        back: "Britain regulated colonial trade on paper but often enforced those rules loosely through absentee customs officials. That inconsistency let colonists smuggle and self-govern, building political habits and expectations that later fueled resistance when Britain tried to tighten control."
+      },
+      {
+        front: "What did the Great Awakening change about colonial religious life?",
+        back: "Traveling preachers like Whitefield emphasized personal, emotional conversion over inherited church authority, splitting congregations into New Lights and Old Lights. By encouraging individuals to judge their own spiritual state, it indirectly encouraged questioning of other traditional hierarchies."
+      },
+      {
+        front: "Why was the Stono Rebellion significant?",
+        back: "Enslaved people near Charleston seized weapons and tried to reach Spanish Florida, making it one of British North America's most significant slave uprisings. Its suppression led colonies to pass harsher, more restrictive slave codes."
+      }
+    ];
+
+    const quizQuestions = [
+      {
+        question: "What was the primary cause of Bacon's Rebellion (1676)?",
+        options: ["A dispute over religious doctrine in Massachusetts", "Frontier settlers' resentment over land access and the colonial government's reluctance to attack nearby Native groups", "A tax dispute with British customs officials", "A conflict between Quakers and the Pennsylvania proprietor"],
+        correct: 1,
+        explanation: "Frontier farmers pushed onto contested land, resented elite neglect, and wanted authority to attack nearby Native groups; when Governor Berkeley hesitated, Bacon's forces attacked and eventually burned Jamestown."
+      },
+      {
+        question: "\"Salutary neglect\" best describes",
+        options: ["A formal treaty ending colonial taxation", "Britain's loose, inconsistent enforcement of trade regulations before 1754", "A Puritan policy on church membership", "The abandonment of the Roanoke colony"],
+        correct: 1,
+        explanation: "Salutary neglect was a pattern of loose enforcement, not an official written policy, that let colonists smuggle and develop real self-government."
+      },
+      {
+        question: "The Navigation Acts were rooted in the logic of",
+        options: ["Democracy", "Mercantilism", "Abolitionism", "The Enlightenment"],
+        correct: 1,
+        explanation: "Mercantilist theory held that colonies existed to enrich the mother country through a favorable balance of trade, which the Navigation Acts enforced."
+      },
+      {
+        question: "The Pueblo Revolt of 1680 is significant because it",
+        options: ["Ended Spanish colonization of the Americas entirely", "Drove Spanish colonizers out of Santa Fe for over a decade", "Created the encomienda system", "Led directly to the French and Indian War"],
+        correct: 1,
+        explanation: "Coordinated Pueblo resistance expelled Spanish colonizers from Santa Fe for more than ten years, showing colonization could be reversed, at least temporarily."
+      },
+      {
+        question: "The Stono Rebellion (1739) led most directly to",
+        options: ["The abolition of slavery in South Carolina", "Harsher, more restrictive slave codes across the colonies", "The founding of Georgia", "The Halfway Covenant"],
+        correct: 1,
+        explanation: "After colonial militia suppressed the uprising, fear of further rebellion led colonies to pass stricter laws controlling enslaved people."
+      },
+      {
+        question: "The First Great Awakening most directly encouraged colonists to",
+        options: ["Abolish all established churches", "Question traditional religious and, indirectly, other forms of authority", "Adopt the Anglican Church uniformly", "Reject the Enlightenment entirely"],
+        correct: 1,
+        explanation: "By stressing that individuals could judge their own spiritual state, the Awakening indirectly encouraged colonists to question other inherited hierarchies, without producing full social equality."
+      },
+      {
+        question: "The Halfway Covenant (1662) changed New England religious practice by",
+        options: ["Ending infant baptism entirely", "Allowing baptism for children of baptized-but-unconverted parents", "Granting full church membership to all Protestants automatically", "Banning the Congregational Church"],
+        correct: 1,
+        explanation: "As Puritan fervor cooled across generations, the Halfway Covenant let children of baptized parents be baptized even without a personal conversion experience, though full membership still required more."
+      },
+      {
+        question: "Why does Period 2 end in 1754?",
+        options: ["Georgia was founded that year", "The French and Indian War began, reshaping imperial and colonial relations", "The Navigation Acts were repealed", "The Salem Witch Trials concluded"],
+        correct: 1,
+        explanation: "The 1754 start of the French and Indian War (part of the global Seven Years' War) reshaped British imperial policy and set up the tensions that open Period 3."
+      }
+    ];
+
+    const essayOutlines = [
+      {
+        label: "Explain why chattel slavery expanded in the British colonies during Period 2",
+        blocks: [
+          ["Claim", "British colonists shifted from indentured servitude toward permanent, race-based chattel slavery because planters wanted a labor force that could not gain land or political rights and could be controlled for life."],
+          ["Evidence", "Use Bacon's Rebellion (1676), the arrival of Barbadian planters in South Carolina, growing staple-crop demand for labor, and the gradual legal construction of hereditary, race-based bondage."],
+          ["Reasoning", "Because freed indentured servants competed for scarce land and, as Bacon's Rebellion showed, could turn dangerous, elites increasingly preferred enslaved labor that was legally bound for life and could not claim the same political rights."],
+          ["Counterpoint", "The shift was gradual and regionally uneven — indentured servitude persisted well into the late 1600s, and slavery's scale varied sharply between the Chesapeake, the Lower South, and New England."]
+        ]
+      },
+      {
+        label: "Compare New England and Chesapeake colonial development",
+        blocks: [
+          ["Claim", "New England and the Chesapeake developed into very different societies because their environments and founding purposes shaped different economies, labor systems, and family structures."],
+          ["New England", "Poor soil discouraged plantations; family migration and a religious mission produced tight, church-centered towns with mixed farming, fishing, and trade, and less reliance on enslaved labor."],
+          ["Chesapeake", "Fertile tobacco land and a profit-seeking founding purpose produced dispersed plantations worked first by indentured servants and increasingly by enslaved Africans, with mostly single male migrants."],
+          ["Outcome", "Both regions built representative institutions (town meetings, the House of Burgesses) with real limits, but their labor systems, family structures, and settlement patterns diverged sharply from shared English origins."]
+        ]
+      },
+      {
+        label: "Explain the effects of the First Great Awakening on colonial society",
+        blocks: [
+          ["Claim", "The First Great Awakening reshaped colonial religious and social life by challenging inherited authority even though it did not produce full social equality."],
+          ["Evidence", "Point to Jonathan Edwards's and George Whitefield's emotional preaching, the split between New Lights and Old Lights, and the growth of new denominations and educational institutions."],
+          ["Reasoning", "Because the Awakening encouraged individuals to judge their own spiritual state rather than defer to educated clergy, it modeled a kind of questioning that could extend, indirectly, to other traditional hierarchies."],
+          ["Link", "This shift toward individual religious authority helped create a more shared intercolonial cultural experience, one factor among several — alongside Enlightenment ideas and colonial self-government — that shaped later political attitudes."]
+        ]
+      }
+    ];
+
+    const nav = document.getElementById("sidebarNav");
+    const ambientOverlay = document.getElementById("ambientOverlay");
+    const main = document.getElementById("main");
+    const cursor = document.getElementById("cursor");
+    const pinBtn = document.getElementById("pinBtn");
+    const sidebar = document.getElementById("sidebar");
+    const apToggleBtn = document.getElementById("apToggleBtn");
+    const bestScoreEl = document.getElementById("bestScore");
+    let currentTab = "dashboard";
+    let quizIndex = 0;
+    let quizScore = 0;
+    let quizLocked = false;
+
+    function renderNav() {
+      nav.innerHTML = tabs.map((tab) => `
+        <button class="nav-btn ${tab.id === currentTab ? "active" : ""}" data-tab="${tab.id}" type="button">
+          <span class="nav-indicator"></span>
+          <span class="nav-icon">${tab.icon}</span>
+          <span class="nav-label">${tab.label}</span>
+        </button>
+      `).join("");
+    }
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll(".tab-content").forEach((section) => {
+        section.classList.toggle("active", section.id === tabId);
+      });
+      document.querySelectorAll(".nav-btn").forEach((button) => {
+        button.classList.toggle("active", button.dataset.tab === tabId);
+      });
+      const tab = tabs.find((entry) => entry.id === tabId);
+      if (tab) ambientOverlay.style.background = tab.ambient;
+      main.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderGlossary(filter = "") {
+      const value = filter.toLowerCase().trim();
+      const items = glossaryTerms.filter((term) => {
+        return term.term.toLowerCase().includes(value) || term.def.toLowerCase().includes(value);
+      });
+      document.getElementById("glossaryGrid").innerHTML = items.map((item) => `
+        <article class="feature-card glossary-card" data-target-tab="${item.tab}">
+          <div class="mini-label">${item.tab}</div>
+          <h4>${item.term}</h4>
+          <div class="body-copy">${item.def}</div>
+        </article>
+      `).join("");
+    }
+
+    function renderFlashcards() {
+      document.getElementById("flashGrid").innerHTML = flashcards.map((card) => `
+        <article class="flash-card" tabindex="0">
+          <div class="flash-inner">
+            <div class="flash-front">
+              <div>
+                <div class="mini-label">Prompt</div>
+                <h3>${card.front}</h3>
+              </div>
+              <div class="flash-hint">Click to reveal</div>
+            </div>
+            <div class="flash-back">
+              <div>
+                <div class="mini-label">Answer</div>
+                <div class="body-copy">${card.back}</div>
+              </div>
+              <div class="flash-hint">Click to flip back</div>
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderEssayTopics() {
+      document.getElementById("essayTopics").innerHTML = essayOutlines.map((outline, index) => `
+        <button class="essay-topic-btn" type="button" data-essay-index="${index}">${outline.label}</button>
+      `).join("");
+      document.getElementById("essayOutline").classList.remove("show");
+      document.getElementById("essayOutline").innerHTML = "";
+    }
+
+    function selectEssay(index) {
+      document.querySelectorAll(".essay-topic-btn").forEach((btn) => {
+        btn.classList.toggle("active", Number(btn.dataset.essayIndex) === index);
+      });
+      const outline = essayOutlines[index];
+      document.getElementById("essayOutline").innerHTML = outline.blocks.map(([label, body]) => `
+        <div class="essay-block">
+          <div class="essay-block-label">${label}</div>
+          <div class="essay-block-body">${body}</div>
+        </div>
+      `).join("");
+      document.getElementById("essayOutline").classList.add("show");
+    }
+
+    function renderQuizQuestion() {
+      const quizMount = document.getElementById("quizMount");
+      const q = quizQuestions[quizIndex];
+      if (!q) {
+        const pct = Math.round((quizScore / quizQuestions.length) * 100);
+        const prevBest = Number(localStorage.getItem("apush_u2_best") || 0);
+        const best = Math.max(prevBest, pct);
+        localStorage.setItem("apush_u2_best", String(best));
+        bestScoreEl.textContent = best + "%";
+        quizMount.innerHTML = `
+          <div class="quiz-status">Complete</div>
+          <div class="quiz-question">Score: ${quizScore} / ${quizQuestions.length}</div>
+          <div class="quiz-feedback">Use the glossary and prompt bank if you missed anything tied to regional divergence, slavery's expansion, or salutary neglect.</div>
+          <div class="quiz-next"><button class="glass-btn" id="restartQuizBtn" type="button">Restart Quiz</button></div>
+        `;
+        return;
+      }
+      quizLocked = false;
+      quizMount.innerHTML = `
+        <div class="quiz-status">Question ${quizIndex + 1} of ${quizQuestions.length}</div>
+        <div class="quiz-question">${q.question}</div>
+        <div class="quiz-options">
+          ${q.options.map((option, index) => `<button class="quiz-option" type="button" data-option-index="${index}">${option}</button>`).join("")}
+        </div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+        <div class="quiz-next" id="quizNext"></div>
+      `;
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add("open");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("open");
+    }
+
+    function initBestScore() {
+      const best = localStorage.getItem("apush_u2_best");
+      bestScoreEl.textContent = best ? best + "%" : "--";
+    }
+
+    renderNav();
+    renderGlossary();
+    renderFlashcards();
+    renderEssayTopics();
+    initBestScore();
+
+    document.addEventListener("mousemove", (event) => {
+      if (!window.matchMedia("(pointer:fine)").matches) return;
+      cursor.style.left = event.clientX + "px";
+      cursor.style.top = event.clientY + "px";
+    });
+
+    document.addEventListener("mouseover", (event) => {
+      if (!window.matchMedia("(pointer:fine)").matches) return;
+      const interactive = event.target.closest("button, a, .flash-card, .glossary-card");
+      cursor.style.width = interactive ? "20px" : "12px";
+      cursor.style.height = interactive ? "20px" : "12px";
+    });
+
+    pinBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("pinned");
+      pinBtn.classList.toggle("pinned");
+      pinBtn.textContent = sidebar.classList.contains("pinned") ? "Pinned" : "Pin";
+    });
+
+    nav.addEventListener("click", (event) => {
+      const button = event.target.closest(".nav-btn");
+      if (!button) return;
+      switchTab(button.dataset.tab);
+    });
+
+    document.querySelectorAll(".note-jump").forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = document.getElementById(button.dataset.noteTarget);
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+    document.getElementById("glossaryFilter").addEventListener("input", (event) => {
+      renderGlossary(event.target.value);
+    });
+
+    document.getElementById("flashGrid").addEventListener("click", (event) => {
+      const card = event.target.closest(".flash-card");
+      if (card) card.classList.toggle("flipped");
+    });
+
+    document.getElementById("openSearch").addEventListener("click", () => {
+      const panel = document.getElementById("sbSearchPanel");
+      panel.classList.toggle("open");
+      if (panel.classList.contains("open")) document.getElementById("sbInput").focus();
+    });
+
+    document.getElementById("sbInput").addEventListener("input", (event) => {
+      const query = event.target.value.toLowerCase().trim();
+      const matches = glossaryTerms.filter((entry) => {
+        return entry.term.toLowerCase().includes(query) || entry.def.toLowerCase().includes(query);
+      }).slice(0, 8);
+      document.getElementById("sbResults").innerHTML = matches.length ? matches.map((item) => `
+        <div class="sb-result" data-target-tab="${item.tab}" data-target-term="${item.term}">
+          <div class="sb-result-tab">${item.tab}</div>
+          <div class="sb-result-term">${item.term}</div>
+          <div class="sb-result-snip">${item.def}</div>
+        </div>
+      `).join("") : `<div class="sb-result"><div class="sb-result-snip">No matches.</div></div>`;
+    });
+
+    document.getElementById("sbResults").addEventListener("click", (event) => {
+      const result = event.target.closest(".sb-result");
+      if (!result || !result.dataset.targetTab) return;
+      switchTab(result.dataset.targetTab);
+      document.getElementById("sbSearchPanel").classList.remove("open");
+      document.getElementById("sbInput").value = "";
+      document.getElementById("sbResults").innerHTML = "";
+      if (result.dataset.targetTab === "glossary") {
+        document.getElementById("glossaryFilter").value = result.dataset.targetTerm;
+        renderGlossary(result.dataset.targetTerm);
+      }
+    });
+
+    document.getElementById("glossaryGrid").addEventListener("click", (event) => {
+      const card = event.target.closest(".glossary-card");
+      if (!card) return;
+      switchTab(card.dataset.targetTab);
+    });
+
+    apToggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("ap-highlight");
+      apToggleBtn.classList.toggle("active");
+    });
+
+    document.getElementById("quizOpenBtn").addEventListener("click", () => {
+      quizIndex = 0;
+      quizScore = 0;
+      renderQuizQuestion();
+      openModal("quizModal");
+    });
+
+    document.getElementById("essayOpenBtn").addEventListener("click", () => {
+      renderEssayTopics();
+      openModal("essayModal");
+    });
+
+    document.getElementById("essayTopics").addEventListener("click", (event) => {
+      const button = event.target.closest(".essay-topic-btn");
+      if (!button) return;
+      selectEssay(Number(button.dataset.essayIndex));
+    });
+
+    document.getElementById("quizMount").addEventListener("click", (event) => {
+      const option = event.target.closest(".quiz-option");
+      if (option && !quizLocked) {
+        quizLocked = true;
+        const q = quizQuestions[quizIndex];
+        const selected = Number(option.dataset.optionIndex);
+        document.querySelectorAll(".quiz-option").forEach((btn, index) => {
+          if (index === q.correct) btn.classList.add("correct");
+          if (index === selected && selected !== q.correct) btn.classList.add("wrong");
+        });
+        if (selected === q.correct) quizScore += 1;
+        document.getElementById("quizFeedback").textContent = q.explanation;
+        document.getElementById("quizNext").innerHTML = `<button class="glass-btn" id="nextQuizBtn" type="button">${quizIndex === quizQuestions.length - 1 ? "See Score" : "Next Question"}</button>`;
+      }
+      if (event.target.id === "nextQuizBtn") {
+        quizIndex += 1;
+        renderQuizQuestion();
+      }
+      if (event.target.id === "restartQuizBtn") {
+        quizIndex = 0;
+        quizScore = 0;
+        renderQuizQuestion();
+      }
+    });
+
+    document.querySelectorAll("[data-close]").forEach((button) => {
+      button.addEventListener("click", () => closeModal(button.dataset.close));
+    });
+
+    document.querySelectorAll(".modal").forEach((modal) => {
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) modal.classList.remove("open");
+      });
+    });
+
+    main.addEventListener("scroll", () => {
+      const max = main.scrollHeight - main.clientHeight;
+      const pct = max > 0 ? (main.scrollTop / max) * 100 : 0;
+      document.getElementById("readingProgressFill").style.width = pct + "%";
+    });
+  </script>
+
+</body>
+</html>
